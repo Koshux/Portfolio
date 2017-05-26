@@ -6,7 +6,7 @@ function Process () {
 	}
 
 	this.fullName = ko.pureComputed(function () {
-	    return viewModel.firstName() + ' ' + viewModel.lastName() 
+	    return this.viewModel.firstName() + ' ' + this.viewModel.lastName() 
 	}, this)
 
 	this.init()
