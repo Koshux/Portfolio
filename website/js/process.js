@@ -5,7 +5,6 @@ function Process () {
 	    lastName: ko.observable('Lanzon'),
         design: {
             raysJewellery: function (element) {
-                console.log(element)
             }
         }
 	}
