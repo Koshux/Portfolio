@@ -1,11 +1,11 @@
 function Process () {
 
-	var viewModel = {
+	this.viewModel = {
 	    firstName: ko.observable('James'),
 	    lastName: ko.observable('Lanzon')
 	}
 
-	var fullName = ko.pureComputed(function () {
+	this.fullName = ko.pureComputed(function () {
 	    return viewModel.firstName() + ' ' + viewModel.lastName() 
 	}, this)
 
@@ -13,11 +13,11 @@ function Process () {
 	showName()
 }
 
-Process.prototype.init = function() {
+Process.prototype.init = function () {
 	ko.applyBindings(viewModel)
 }
 
-function showName () {
+Process.prototype.showName = function () {
 	console.log(fullName())
 }
 
