@@ -14,8 +14,14 @@ function Process () {
 }
 
 Process.prototype.init = function() {
+	// makeBindings.call(this)
 	ko.applyBindings(viewModel)
 }
+
+Process.prototype.registerElement = function(element) {
+	$(element).tooltip()
+	return true
+};
 
 function showName () {
 	console.log(fullName())

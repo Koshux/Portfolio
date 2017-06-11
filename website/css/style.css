@@ -1,3 +1,21 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
 body {
     padding-top: 70px;
+}
+
+.portfolio-about-me__margin {
+	margin: 15px 15px 0 0;
+}
+
+@media(min-width:480px) {
+
+	.portfolio-jumbotron-ul__margin {
+		margin: 50px 10px 0 -50px;
+	}
+
+
+	.portfolio-jumbotron-ul__padding {
+		padding: 0 -50px 0 0;
+	}
 }
