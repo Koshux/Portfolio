@@ -4,8 +4,16 @@ body {
     padding-top: 70px;
 }
 
+a {
+	text-decoration-line: none; !important
+}
+
 .portfolio-about-me__margin {
 	margin: 15px 15px 0 0;
+}
+
+.portfolio-services__header-font {
+	font-size: 48px;
 }
 
 @media(min-width:480px) {
