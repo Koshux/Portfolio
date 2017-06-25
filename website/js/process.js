@@ -1,5 +1,4 @@
 function Process () {
-
 	this.viewModel = {
 	    firstName: ko.observable('James'),
 	    lastName: ko.observable('Lanzon')
@@ -13,6 +12,7 @@ function Process () {
 	showName.call(this)
 	
 }
+
 
 Process.prototype.init = function() {
 }

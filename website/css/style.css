@@ -20,11 +20,9 @@ a {
 }
 
 @media(min-width:480px) {
-
 	.portfolio-jumbotron-ul__margin {
 		margin: 50px 10px 0 -50px;
 	}
-
 
 	.portfolio-jumbotron-ul__padding {
 		padding: 0 -50px 0 0;
