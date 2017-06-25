@@ -7,6 +7,11 @@ body {
 a {
 	text-decoration-line: none; !important
 }
+
+.portfolio-nav__home-margin {
+	margin: -8px 0 0 25px;
+}
+
 .portfolio-about-me__row-margin {
 	margin-top: 15px;
 }
