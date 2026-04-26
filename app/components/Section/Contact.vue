@@ -47,7 +47,7 @@ defineProps<Props>()
             <span class="break-all">{{ contact.email }}</span>
           </a>
           <p class="mt-4 max-w-md text-sm text-paper-white/60">
-            Open to senior individual-contributor and technical-leadership roles &mdash; contract or full-time.
+            Available for contractual part-time engagements — senior individual-contributor and technical-leadership work.
           </p>
         </div>
 
