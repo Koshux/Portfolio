@@ -27,7 +27,11 @@ export async function useLiveSignal(): Promise<UseLiveSignal> {
   })
 
   const signal = computed<LiveSignal>(() => (data.value as LiveSignal | null) ?? FALLBACK)
-  const isUnavailable = computed(() => 'unavailable' in signal.value && signal.value.unavailable === true)
+  // Treat anything missing the commit-data shape as unavailable. This is
+  // robust to the @nuxt/content data-collection envelope (which may add
+  // metadata fields and is not guaranteed to round-trip the literal
+  // `unavailable: true` flag in v3).
+  const isUnavailable = computed(() => !('repo' in signal.value))
 
   return { signal, isUnavailable }
 }
