@@ -33,14 +33,22 @@ export default defineNuxtConfig({
     baseURL: '/',
     buildAssetsDir: 'assets',
     head: {
-      title: 'James Lanzon // UX Architect & Above Bored',
+      title: 'James Lanzon — UX Architect & Accessibility Expert',
       meta: [
-        { name: 'description', content: 'UX Architect specializing in mission-critical applications and accessibility at the European Commission. Founder of Above Bored (CHRA).' },
-        { name: 'theme-color', content: '#00DC82' }
+        { name: 'description', content: 'UX Architect & Accessibility Expert at the European Commission. Senior full-stack engineer based in Malta.' },
+        { name: 'theme-color', content: '#0b1020' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16.png' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/site.webmanifest' },
       ],
       htmlAttrs: {
-        lang: 'en'
-      }
+        lang: 'en',
+      },
     },
   },
   compatibilityDate: '2026-04-25', // Locked to today's date for Nuxt 4 stable behavior

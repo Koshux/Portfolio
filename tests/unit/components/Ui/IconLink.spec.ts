@@ -1,4 +1,4 @@
-// @vitest-environment nuxt
+﻿// @vitest-environment nuxt
 import { describe, it, expect } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import IconLink from '../../../../app/components/Ui/IconLink.vue'
@@ -8,7 +8,7 @@ describe('IconLink', () => {
     const wrapper = await mountSuspended(IconLink, {
       props: {
         href: 'https://github.com/jameslanzon',
-        ariaLabel: "James' GitHub profile",
+        label: "James' GitHub profile",
         srLabel: 'GitHub',
       },
       slots: {
@@ -26,7 +26,7 @@ describe('IconLink', () => {
     const wrapper = await mountSuspended(IconLink, {
       props: {
         href: '#contact',
-        ariaLabel: 'Email James',
+        label: 'Email James',
         srLabel: 'Email',
       },
       slots: {
@@ -42,7 +42,7 @@ describe('IconLink', () => {
     const wrapper = await mountSuspended(IconLink, {
       props: {
         href: 'https://github.com/jameslanzon',
-        ariaLabel: "James' GitHub profile",
+        label: "James' GitHub profile",
         srLabel: 'GitHub',
         external: true,
       },
@@ -56,7 +56,7 @@ describe('IconLink', () => {
     const wrapper = await mountSuspended(IconLink, {
       props: {
         href: 'mailto:lanzonprojects@gmail.com',
-        ariaLabel: 'Email James',
+        label: 'Email James',
         srLabel: 'Email',
       },
     })
