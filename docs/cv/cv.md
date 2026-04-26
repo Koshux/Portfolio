@@ -50,5 +50,5 @@ While known as the reigning table soccer champion at RS2, he is also an avid gym
 
 # Contact  
 📍 Malta
-📧 jameslanzon@gmail.com 
+📧 lanzonprojects@gmail.com 
 🔗 [jameslanzon.com](http://jameslanzon.com)
