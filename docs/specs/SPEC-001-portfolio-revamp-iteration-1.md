@@ -697,7 +697,7 @@ One row per acceptance criterion (multiple rows allowed). Layers per
 > ADR using [docs/decisions/_TEMPLATE.md](../decisions/_TEMPLATE.md)
 > with the contents specified in T1 below.
 
-- [ ] **T1** — Author
+- [x] **T1** — Author
       [docs/decisions/ADR-001-live-signal-build-time.md](../decisions/ADR-001-live-signal-build-time.md)
       from `docs/decisions/_TEMPLATE.md`. Required sections:
       **Context** (static site, no runtime API calls, no JS-disabled
@@ -716,10 +716,10 @@ One row per acceptance criterion (multiple rows allowed). Layers per
       private data is fetched, written to disk, or rendered;
       `GITHUB_TOKEN` is read from `process.env` only and never
       persisted). T1 must land before T2 begins.
-- [ ] **T2** — Add `cv` and `liveSignal` collections to
+- [x] **T2** — Add `cv` and `liveSignal` collections to
       `content.config.ts` per §Data shapes. Author
       `tests/integration/content/cv-schema.spec.ts`.
-- [ ] **T3** — **Cleanup pass.** (a) Delete the repo-root `index.html`.
+- [x] **T3** — **Cleanup pass.** (a) Delete the repo-root `index.html`.
       (b) Move `website/` to `docs/legacy/website-2016-2018/` and add a
       short `README.md` there marking it a frozen historical artefact —
       do not extend, do not serve. (c) Read
@@ -728,13 +728,13 @@ One row per acceptance criterion (multiple rows allowed). Layers per
       the legacy folder. (d) Move `CNAME` from the repo root to
       `public/CNAME` so `nuxt generate` copies it into
       `.output/public/CNAME`.
-- [ ] **T4** — Add Tailwind CSS entry (`app/assets/css/tailwind.css`),
+- [x] **T4** — Add Tailwind CSS entry (`app/assets/css/tailwind.css`),
       register it in `nuxt.config.ts`, update `tailwind.config.js`
       content globs, wire `theme.fontFamily.sans` to the
       `@nuxt/fonts`-managed family.
-- [ ] **T5** — Implement `app/utils/sortRoles.ts` + unit test.
-- [ ] **T6** — Implement `app/utils/relativeTime.ts` + unit test.
-- [ ] **T7** — Implement `scripts/fetch-live-signal.mjs` per the
+- [x] **T5** — Implement `app/utils/sortRoles.ts` + unit test.
+- [x] **T6** — Implement `app/utils/relativeTime.ts` + unit test.
+- [x] **T7** — Implement `scripts/fetch-live-signal.mjs` per the
       §Affected areas description, including the
       `SKIP_LIVE_SIGNAL_FETCH=1` early-exit branch and the
       `GITHUB_TOKEN` Authorization header. Add the placeholder
@@ -746,10 +746,10 @@ One row per acceptance criterion (multiple rows allowed). Layers per
       Author `tests/unit/scripts/fetch-live-signal.spec.ts` covering
       all six branches (success, 403 + rate limit, network error,
       malformed JSON, no PushEvent, `SKIP_LIVE_SIGNAL_FETCH=1`).
-- [ ] **T8** — Implement `app/composables/useLiveSignal.ts` +
+- [x] **T8** — Implement `app/composables/useLiveSignal.ts` +
       `app/composables/useMaltaClock.ts` + unit tests (Vitest fake
       timers for the clock).
-- [ ] **T9** — Implement `app/composables/useCvContent.ts` + unit test
+- [x] **T9** — Implement `app/composables/useCvContent.ts` + unit test
       (uses `sortRoles`).
 - [ ] **T10** — Implement `app/components/Ui/IconLink.vue`,
       `app/components/Ui/LiveSignal.vue`, and

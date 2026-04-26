@@ -9,9 +9,10 @@ dist
 # Node dependencies
 node_modules
 
-# Logs
-logs
+# Logs (runtime only — SDLC docs/logs/ is the agent audit trail and is tracked)
+/logs
 *.log
+!docs/logs/
 
 # Misc
 .DS_Store
