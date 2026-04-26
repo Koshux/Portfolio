@@ -6,6 +6,7 @@
 // Linux only.
 //
 // See: .github/instructions/testing.instructions.md
+// @vitest-environment nuxt
 import { describe, it, expect } from 'vitest'
 
 describe('nuxt runtime environment', () => {
