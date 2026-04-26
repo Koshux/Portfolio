@@ -18,6 +18,7 @@ both **GitHub Copilot** and **Claude Code**, and it points to:
 
 ```bash
 npm install            # install deps
+node scripts/setup-dev.mjs  # one-shot: skip-worktree on content/live-signal.json
 npm run dev            # local dev server (rarely needed)
 npm run generate       # produce static .output/public
 npm run preview        # serve the generated output
@@ -27,6 +28,39 @@ npm run test:unit      # vitest unit + component
 npm run test:int       # vitest + @nuxt/test-utils
 npm run test:e2e       # playwright against generated output
 ```
+
+### Live-signal chip
+
+The header chip ("commit · X days ago") is generated **at build time** by
+[`scripts/fetch-live-signal.mjs`](./scripts/fetch-live-signal.mjs), which
+hits the public GitHub events API and writes `content/live-signal.json`.
+The build never fails: every error path writes the unavailable fallback
+and the chip degrades to "GitHub · recent activity". See
+[ADR-001](./docs/decisions/ADR-001-live-signal-build-time.md).
+
+| Env var | Effect |
+|---|---|
+| `GITHUB_TOKEN` | _Optional_. Lifts the unauthenticated rate limit (60/h → 5 000/h). Read from `process.env`, never written to disk. |
+| `SKIP_LIVE_SIGNAL_FETCH=1` | Skip the API call entirely. Used by tests + CI to keep `content/live-signal.json` deterministic. |
+
+`content/live-signal.json` is **tracked** (with the unavailable
+placeholder) so fresh clones build out-of-the-box. Running
+`node scripts/setup-dev.mjs` after `npm install` applies
+`git update-index --skip-worktree` so subsequent build-time writes don't
+appear in `git status`. CI runs ephemeral checkouts and is unaffected.
+
+### Editorial source for the CV
+
+[`docs/cv/cv.md`](./docs/cv/cv.md) is the editorial source of truth for
+James' CV. `content/cv.md` carries only the frontmatter consumed by
+`@nuxt/content`. To update copy: edit the editorial file, then mirror the
+relevant frontmatter into `content/cv.md`.
+
+### Legacy site
+
+The 2016–2018 static site lives under
+[`docs/legacy/website-2016-2018/`](./docs/legacy/website-2016-2018/) for
+reference only. Do not extend it — new work belongs under `app/`.
 
 ## SDLC at a glance
 
