@@ -5,6 +5,9 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    /* Sticky header is ~57px tall; offset anchor jumps and sequential
+       (Tab) focus scrolling so focused elements aren't hidden under it. */
+    scroll-padding-top: 5rem;
   }
 
   body {

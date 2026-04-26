@@ -15,15 +15,16 @@ defineProps<Props>()
         <span aria-hidden="true" class="h-px w-8 bg-nuxt-green" />
         Selected work
       </h2>
-      <ul class="grid items-start gap-4 sm:grid-cols-2">
+      <ul class="grid gap-4 sm:grid-cols-2">
         <li
-          v-for="project in projects"
+          v-for="(project, index) in projects"
           :key="project.href"
-          class="flex flex-col rounded-2xl border border-paper-white/10 p-5 motion-safe:transition-colors hover:border-nuxt-green/60"
+          class="group relative flex flex-col rounded-2xl border border-paper-white/10 p-5 motion-safe:transition-colors hover:border-nuxt-green/60 focus-within:border-nuxt-green/60"
         >
           <h3 class="text-lg font-semibold tracking-tight">
             <a
               :href="project.href"
+              :aria-describedby="`project-desc-${index}`"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-start gap-1.5 text-paper-white underline underline-offset-4 decoration-paper-white/30 hover:decoration-nuxt-green hover:text-nuxt-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nuxt-green motion-safe:transition-colors"
@@ -48,10 +49,7 @@ defineProps<Props>()
           <p v-if="project.role" class="mt-1 text-sm text-nuxt-green/90">
             {{ project.role }}
           </p>
-          <p class="mt-3 text-sm text-paper-white/85">
-            {{ project.summary }}
-          </p>
-          <p v-if="project.repo" class="mt-auto pt-4 text-sm">
+          <p v-if="project.repo" class="mt-3 text-sm">
             <a
               :href="project.repo"
               target="_blank"
@@ -72,6 +70,30 @@ defineProps<Props>()
               <span>Source</span>
             </a>
           </p>
+
+          <!--
+            Accessible description: kept in the DOM via .sr-only and
+            linked from the title link with aria-describedby, so screen
+            readers announce it without any hover/focus interaction.
+            (WCAG 2.2 — 1.3.1 Info & Relationships, 4.1.2 Name/Role/Value.)
+          -->
+          <span :id="`project-desc-${index}`" class="sr-only">{{ project.summary }}</span>
+
+          <!--
+            Visual tooltip slides up from the bottom of the card on hover
+            or when any descendant has focus. aria-hidden because the
+            same text is already exposed via aria-describedby above — we
+            don't want it announced twice. Persists while the pointer is
+            over the card or focus is inside it (WCAG 2.2 — 1.4.13:
+            hoverable + persistent; dismiss by moving focus / pointer
+            away). motion-safe gates the slide for reduced-motion users.
+          -->
+          <div
+            aria-hidden="true"
+            class="pointer-events-none absolute left-0 right-0 top-full z-10 mt-2 origin-top scale-95 rounded-xl border border-nuxt-green/40 bg-ink-black/95 px-4 py-3 text-sm text-paper-white/90 opacity-0 shadow-lg shadow-ink-black/60 backdrop-blur-sm motion-safe:transition motion-safe:duration-150 group-hover:scale-100 group-hover:opacity-100 group-focus-within:scale-100 group-focus-within:opacity-100"
+          >
+            {{ project.summary }}
+          </div>
         </li>
       </ul>
     </div>
