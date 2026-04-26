@@ -9,6 +9,7 @@ export {
   roleSchema,
   skillGroupSchema,
   socialLinkSchema,
+  projectSchema,
   cvFrontmatterSchema,
   liveSignalSchema,
 } from './shared/content-schemas'

@@ -13,7 +13,7 @@ withDefaults(defineProps<Props>(), {
 <template>
   <a
     :href="href"
-    class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-ink-black focus:px-4 focus:py-2 focus:text-paper-white focus:outline-none focus:ring-2 focus:ring-nuxt-green"
+    class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-paper-white focus:px-4 focus:py-2 focus:text-ink-black focus:outline-none focus:ring-2 focus:ring-nuxt-green"
   >
     {{ label }}
   </a>

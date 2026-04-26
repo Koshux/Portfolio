@@ -16,7 +16,7 @@ import { writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
 const OUTPUT_PATH = resolve(process.cwd(), 'content/live-signal.json')
-const ENDPOINT = 'https://api.github.com/users/jameslanzon/events/public?per_page=30'
+const ENDPOINT = 'https://api.github.com/users/koshux/events/public?per_page=30'
 const USER_AGENT = 'jameslanzon.com-portfolio-build'
 
 function log(message) {
@@ -94,11 +94,16 @@ export async function run() {
 
   const push = events.find(
     e => e?.type === 'PushEvent'
-      && e?.payload?.commits
-      && Array.isArray(e.payload.commits)
-      && e.payload.commits.length > 0
+      && e?.payload
       && typeof e?.repo?.name === 'string'
-      && typeof e?.created_at === 'string',
+      && typeof e?.created_at === 'string'
+      && (
+        // GitHub omits `payload.commits` when the push is large or
+        // anonymous; fall back to `payload.head` (the head SHA after
+        // the push), which is always present on PushEvents.
+        typeof e.payload.head === 'string'
+        || (Array.isArray(e.payload.commits) && e.payload.commits.length > 0)
+      ),
   )
 
   if (!push) {
@@ -106,13 +111,22 @@ export async function run() {
     return 0
   }
 
-  const commit = push.payload.commits[push.payload.commits.length - 1]
-  if (!commit || typeof commit.sha !== 'string') {
+  let sha
+  if (Array.isArray(push.payload.commits) && push.payload.commits.length > 0) {
+    const commit = push.payload.commits[push.payload.commits.length - 1]
+    if (commit && typeof commit.sha === 'string') {
+      sha = commit.sha
+    }
+  }
+  if (!sha && typeof push.payload.head === 'string') {
+    sha = push.payload.head
+  }
+  if (!sha) {
     await writeUnavailable('PushEvent missing commit sha')
     return 0
   }
 
-  await writeSuccess(push.repo.name, commit.sha.slice(0, 7), push.created_at)
+  await writeSuccess(push.repo.name, sha.slice(0, 7), push.created_at)
   return 0
 }
 

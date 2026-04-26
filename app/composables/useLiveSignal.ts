@@ -23,7 +23,14 @@ interface UseLiveSignal {
 export async function useLiveSignal(): Promise<UseLiveSignal> {
   const { data } = await useAsyncData('live-signal', async () => {
     const result = await queryCollection('liveSignal').first()
-    return (result as LiveSignal | null) ?? FALLBACK
+    if (!result) return FALLBACK
+    // @nuxt/content v3 wraps JSON data-collection records in an envelope
+    // ({ id, extension, meta, stem, __hash__ }); the actual JSON payload
+    // lives under `meta`. Older shapes returned the JSON at the root, so
+    // we tolerate both.
+    const r = result as unknown as Record<string, unknown>
+    const inner = (r.meta && typeof r.meta === 'object') ? r.meta as Record<string, unknown> : r
+    return (inner as unknown as LiveSignal) ?? FALLBACK
   })
 
   const signal = computed<LiveSignal>(() => (data.value as LiveSignal | null) ?? FALLBACK)

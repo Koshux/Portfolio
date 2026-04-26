@@ -16,6 +16,21 @@ overview: |
   strategy. Beyond coding, he is a continuous learner and mentor — whether
   refining UX, optimising developer experience, or leading a rewrite, he
   thrives on solving complex problems efficiently.
+projects:
+  - title: "Above Bored — Seed to Sale ERP"
+    href: "https://app.abovebored.mt"
+    summary: "Co-founded non-profit Cannabis Harm Reduction Association (CHRA-0014) operating under Malta's ARUC framework. Building the seed-to-sale ERP — closed-loop member registry, distribution logging, and compliance reporting for a member-only association (no public substance promotion)."
+    role: "President & Head of Distribution"
+    repo: "https://github.com/aboveboard-mt/dam-jam"
+  - title: "Business Energy Quotes"
+    href: "https://businessenergyquotes.com"
+    summary: "Public-facing energy-quote generator. Maintained and extended at NGP — Nuxt 2 app, new service pages, chatbot, GA, GDPR cookie consent."
+    role: "Senior full-stack developer"
+  - title: "Vue 3 vs React"
+    href: "https://ptl-workshop-vue.netlify.app/"
+    summary: "Hands-on Vue 3 ↔ React training built for a 3-day workshop at PTL Malta. Parallel apps + Reveal.js slides for code-pairing sessions."
+    role: "Trainer & author"
+    repo: "https://github.com/koshux/vue-vs-react"
 experience:
   - title: "Application / Cloud Architect"
     organisation: "European Commission (DG-EAC)"

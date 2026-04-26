@@ -19,7 +19,7 @@ useSeoMeta({
 <template>
   <div>
     <SectionHero :hero="cv.hero.value" />
-    <SectionOverview :overview="cv.overview.value" />
+    <SectionProjects :projects="cv.projects.value" />
     <SectionExperience :roles="cv.experience.value" />
     <SectionSkills :groups="cv.skills.value" />
     <SectionContact :contact="cv.contact.value" />

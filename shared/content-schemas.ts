@@ -21,6 +21,14 @@ export const socialLinkSchema = z.object({
   href: z.string().url(),
 })
 
+export const projectSchema = z.object({
+  title: z.string(),
+  href: z.string().url(),
+  summary: z.string(),
+  role: z.string().optional(),
+  repo: z.string().url().optional(),
+})
+
 export const cvFrontmatterSchema = z.object({
   title: z.string(),
   description: z.string(),
@@ -32,6 +40,7 @@ export const cvFrontmatterSchema = z.object({
     tagline: z.string().max(200),
   }),
   overview: z.string(),
+  projects: z.array(projectSchema).default([]),
   experience: z.array(roleSchema).min(1),
   skills: z.array(skillGroupSchema).min(1),
   contact: z.object({

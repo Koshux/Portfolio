@@ -5,6 +5,7 @@ import type {
   CvDocument,
   HeroBlock,
   OgBlock,
+  Project,
   Role,
   SkillGroup,
 } from '../types/cv'
@@ -13,6 +14,7 @@ import { sortRoles } from '../utils/sortRoles'
 interface UseCvContent {
   hero: ComputedRef<HeroBlock>
   overview: ComputedRef<string>
+  projects: ComputedRef<Project[]>
   experience: ComputedRef<Role[]>
   skills: ComputedRef<SkillGroup[]>
   contact: ComputedRef<ContactBlock>
@@ -43,6 +45,7 @@ export async function useCvContent(): Promise<UseCvContent> {
 
   const hero = computed<HeroBlock>(() => doc.value?.hero ?? EMPTY_HERO)
   const overview = computed<string>(() => doc.value?.overview ?? '')
+  const projects = computed<Project[]>(() => doc.value?.projects ?? [])
   const experience = computed<Role[]>(() => sortRoles(doc.value?.experience ?? []))
   const skills = computed<SkillGroup[]>(() => doc.value?.skills ?? [])
   const contact = computed<ContactBlock>(() => doc.value?.contact ?? EMPTY_CONTACT)
@@ -52,6 +55,7 @@ export async function useCvContent(): Promise<UseCvContent> {
   return {
     hero,
     overview,
+    projects,
     experience,
     skills,
     contact,

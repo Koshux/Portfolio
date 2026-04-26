@@ -14,17 +14,15 @@ defineProps<Props>()
       <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">
         {{ hero.name }}
       </h1>
-      <p class="mt-3 text-lg text-ink-black/80 sm:text-xl">
+      <p class="mt-3 text-lg text-paper-white/80 sm:text-xl">
         {{ hero.title }} — {{ hero.employer }}
       </p>
-      <p class="mt-6 max-w-2xl text-base text-ink-black/70 sm:text-lg">
-        {{ hero.tagline }}
-      </p>
+      <!-- Tagline intentionally hidden in iteration 1 polish; data retained. -->
       <p class="mt-8">
         <a
           data-testid="hero-cta"
           href="#contact"
-          class="inline-flex items-center gap-2 rounded-full bg-ink-black px-5 py-2.5 text-sm font-medium text-paper-white motion-safe:transition-colors hover:bg-ink-black/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nuxt-green"
+          class="inline-flex items-center gap-2 rounded-full bg-nuxt-green px-5 py-2.5 text-sm font-semibold text-ink-black motion-safe:transition-colors hover:bg-nuxt-green/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nuxt-green focus-visible:ring-offset-2 focus-visible:ring-offset-ink-black"
         >
           Get in touch
           <span aria-hidden="true">→</span>

@@ -21,6 +21,14 @@ export interface SocialLink {
   href: string
 }
 
+export interface Project {
+  title: string
+  href: string
+  summary: string
+  role?: string
+  repo?: string
+}
+
 export interface HeroBlock {
   name: string
   title: string
@@ -45,6 +53,7 @@ export interface CvDocument {
   updated: string
   hero: HeroBlock
   overview: string
+  projects: Project[]
   experience: Role[]
   skills: SkillGroup[]
   contact: ContactBlock

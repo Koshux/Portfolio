@@ -24,13 +24,11 @@ function formatDate(value: string): string {
 <template>
   <article>
     <h3 class="text-lg font-semibold tracking-tight">{{ role.title }}</h3>
-    <p class="text-sm text-ink-black/70">
+    <p class="text-sm text-paper-white/70">
       <span>{{ role.organisation }}</span>
       <span aria-hidden="true"> · </span>
       <span>{{ dateRange }}</span>
     </p>
-    <ul class="mt-3 list-disc space-y-1.5 pl-5 text-base text-ink-black/85" style="overflow-wrap: anywhere;">
-      <li v-for="(bullet, i) in role.bullets" :key="i">{{ bullet }}</li>
-    </ul>
+    <!-- Bullets intentionally hidden in iteration 1 polish; data retained. -->
   </article>
 </template>
