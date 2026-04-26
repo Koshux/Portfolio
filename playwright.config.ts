@@ -18,13 +18,30 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'mobile-safari', use: { ...devices['iPhone 13'] } },
+    {
+      name: 'mobile',
+      use: {
+        ...devices['iPhone 13'],
+        viewport: { width: 360, height: 600 },
+        // iPhone 13 device descriptor is mobile Safari; coerce headless Chromium
+        // by overriding browserName so axe + lighthouse stays single-browser.
+        browserName: 'chromium',
+        isMobile: true,
+        defaultBrowserType: 'chromium',
+      },
+    },
+    {
+      name: 'desktop',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+      },
+    },
   ],
   webServer: {
-    // Test the *generated* static output, not the dev server.
-    command: 'npm run preview',
+    // Test the *generated* static output. Single source of truth: a fresh
+    // clone running `npm run test:e2e` produces .output/public and serves it.
+    command: 'npm run generate && npm run preview',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
