@@ -57,7 +57,7 @@ onBeforeUnmount(() => {
   -->
   <details
     ref="root"
-    class="relative sm:hidden"
+    class="relative md:hidden"
     @toggle="onToggle"
   >
     <summary
@@ -121,6 +121,24 @@ onBeforeUnmount(() => {
         </svg>
         <span>Email</span>
       </a>
+      <a
+        href="https://www.linkedin.com/in/james-lanzon/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-paper-white hover:bg-paper-white/5 hover:text-nuxt-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nuxt-green motion-safe:transition-colors"
+        @click="close"
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="h-4 w-4 shrink-0"
+        >
+          <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z" />
+        </svg>
+        <span>LinkedIn</span>
+      </a>
     </div>
   </details>
 
@@ -128,7 +146,7 @@ onBeforeUnmount(() => {
     Desktop: render the two icon links inline. Hidden below sm so the
     mobile dropdown above is the only path on small screens.
   -->
-  <div class="hidden items-center gap-1 sm:flex sm:gap-2">
+  <div class="hidden items-center gap-1 md:flex md:gap-2">
     <UiIconLink
       href="https://github.com/koshux"
       :label="`James' GitHub profile`"
@@ -163,6 +181,22 @@ onBeforeUnmount(() => {
       >
         <rect x="3" y="5" width="18" height="14" rx="2" />
         <path d="m3 7 9 6 9-6" />
+      </svg>
+    </UiIconLink>
+    <UiIconLink
+      href="https://www.linkedin.com/in/james-lanzon/"
+      :label="`James' LinkedIn profile`"
+      sr-label="LinkedIn"
+      :external="true"
+    >
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        class="h-5 w-5"
+      >
+        <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z" />
       </svg>
     </UiIconLink>
   </div>

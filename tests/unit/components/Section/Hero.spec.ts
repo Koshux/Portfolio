@@ -24,9 +24,9 @@ describe('Section/Hero', () => {
     expect(wrapper.text()).toMatch(/UX Architect.*—.*European Commission/)
   })
 
-  it('renders the tagline as a paragraph', async () => {
+  it('does not render the tagline (intentionally hidden in iteration 1 polish)', async () => {
     const wrapper = await mountSuspended(Hero, { props: { hero } })
-    expect(wrapper.text()).toContain(hero.tagline)
+    expect(wrapper.text()).not.toContain(hero.tagline)
   })
 
   it('renders a hero CTA targeting #contact with data-testid="hero-cta"', async () => {

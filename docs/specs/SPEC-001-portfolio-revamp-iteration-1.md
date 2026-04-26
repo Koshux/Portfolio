@@ -691,6 +691,9 @@ One row per acceptance criterion (multiple rows allowed). Layers per
 | component | `tests/unit/components/Section/Skills.spec.ts` â€” `H2` for section, one `H3` per skill group. | AC-25 |
 | integration | `tests/integration/pages/landmarks.spec.ts` â€” heading sequence is exactly `H1 â†’ H2 â†’ H3 â€¦` with no level skipped. | AC-25 |
 | integration | `tests/integration/pages/cname.spec.ts` â€” after `nuxt generate`, `.output/public/CNAME` exists with the contents `jameslanzon.com`. | AC-26 |
+| component | `tests/unit/components/Ui/ContactMenu.spec.ts` — iteration-7 header dropdown: single `<details>` marked `md:hidden`; `<summary>` carries `aria-label="Contact menu"` with `aria-hidden`/`focusable="false"` icon; toggle event flips open state; Escape closes; panel exposes exactly three links (GitHub, Email, LinkedIn); LinkedIn (mobile + desktop) opens in a new tab with `rel` containing `noopener noreferrer`; the `md:flex` desktop cluster carries the same three actions. | AC-2, AC-4, AC-17 |
+| e2e (smoke) | `tests/e2e/home.smoke.spec.ts` — generated home page renders with title + hero `H1`; clicking `[data-testid="hero-cta"]` updates the location hash to `#contact` and the contact section is in viewport; a `mailto:lanzonprojects@gmail.com` link is reachable inside `#contact`; iteration-7 has no sitewide `<footer>` element. | AC-1, AC-2, AC-15 |
+| integration | `tests/integration/pages/content.spec.ts` — generated HTML contains the dynamic-year copyright string `© <year> James Lanzon. All rights reserved.` rendered inside the contact aside (replaces the removed sitewide footer). | AC-15 |
 
 > **Why `playwright-lighthouse` for AC-12.** It runs inside the existing
 > e2e suite â€” single runner, single report, single browser context.

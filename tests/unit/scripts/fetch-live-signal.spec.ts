@@ -9,7 +9,7 @@ vi.mock('node:fs/promises', () => ({
   }),
 }))
 
-const ENDPOINT_RX = /api\.github\.com\/users\/jameslanzon\/events\/public/
+const ENDPOINT_RX = /api\.github\.com\/users\/koshux\/events\/public/
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {

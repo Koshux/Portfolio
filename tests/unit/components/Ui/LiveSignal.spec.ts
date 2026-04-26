@@ -24,7 +24,10 @@ describe('LiveSignal', () => {
   it('renders the unavailable fallback string when signal is unavailable', async () => {
     state.signal = { unavailable: true, fetchedAt: '2026-04-26T12:00:00Z' }
     const wrapper = await mountSuspended(LiveSignal)
-    expect(wrapper.text()).toContain('GitHub · recent activity')
+    // The chip carries the GitHub mark visually + an aria-label; the
+    // visible text only says "recent activity" so it stays compact.
+    expect(wrapper.text()).toContain('recent activity')
+    expect(wrapper.get('[role="status"]').attributes('aria-label')).toMatch(/GitHub/i)
   })
 
   it('does not render any commit data when signal is unavailable', async () => {

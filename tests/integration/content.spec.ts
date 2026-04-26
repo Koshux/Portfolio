@@ -50,16 +50,29 @@ describe('generated /index.html — content from content/cv.md', () => {
     expect(html).toContain('lanzonprojects@gmail.com')
   })
 
-  it('renders the literal "CV available on request" line', () => {
-    expect(html).toContain('CV available on request')
+  it('renders the "CV / Available on request" copy in the contact aside', () => {
+    // Iteration-7 split the line into a label ("CV") and value
+    // ("Available on request") inside the contact aside.
+    expect(decoded).toContain('Available on request')
+    expect(decoded).toMatch(/>\s*CV\s*</)
+  })
+
+  it('renders the dynamic-year copyright in the contact aside (no sitewide footer)', () => {
+    const year = new Date().getFullYear()
+    expect(decoded).toContain(`© ${year} James Lanzon. All rights reserved.`)
   })
 
   it('renders the live-signal chip with role="status" and aria-live="polite"', () => {
     expect(html).toMatch(/role="status"[^>]*aria-live="polite"|aria-live="polite"[^>]*role="status"/)
   })
 
-  it('renders the unavailable fallback string when live-signal.json is unavailable', () => {
-    expect(html).toContain('GitHub · recent activity')
+  it('renders the live-signal chip with its GitHub aria-label and one of the two branches', () => {
+    expect(html).toMatch(/aria-label="Latest GitHub activity"/)
+    // Either the unavailable fallback ("recent activity") or the
+    // commit-data branch (a repo name + a relative time "… ago").
+    const hasUnavailable = html.includes('recent activity')
+    const hasCommitData = /[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/.test(html) && /ago|just now/.test(html)
+    expect(hasUnavailable || hasCommitData).toBe(true)
   })
 
   it('does not contain the legacy jameslanzon@gmail.com address', () => {

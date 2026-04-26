@@ -1,7 +1,13 @@
 # jameslanzon.com — Portfolio
 
 Personal portfolio for [jameslanzon.com](https://jameslanzon.com), built with
-**Nuxt 4** and statically generated to **GitHub Pages**.
+**Nuxt 4** (Composition API, `<script setup lang="ts">`) and statically
+generated to **GitHub Pages** via `nitro.preset = 'github-pages'`. Tailwind 3
+for styling, `@nuxt/content` for the CV/copy source of truth, `@nuxt/fonts`
+for Inter, `@nuxt/image` for asset optimisation. Single-page layout: hero →
+selected work (with hover/focus tooltips) → experience timeline → skills →
+contact. Dark theme with `nuxt-green` accent. Live-signal chip in the header
+exposes the latest commit on `koshux/Portfolio` at build time.
 
 ## For AI agents
 
@@ -14,29 +20,89 @@ both **GitHub Copilot** and **Claude Code**, and it points to:
 - The orchestrator skill → [.github/skills/sdlc-workflow/SKILL.md](./.github/skills/sdlc-workflow/SKILL.md)
 - Slash-command prompts → [.github/prompts/](./.github/prompts/) (`/journey`, `/spec`, `/implement`, `/test`, `/log`, `/adr`)
 
-## For humans
+## For humans — pickup-and-go guide
+
+### Prerequisites
+
+- **Node.js 20.x** (Nitro and `@nuxt/content` v3 require ≥ 20.11). Verify
+  with `node -v`.
+- **npm 10.x** (ships with Node 20).
+- A POSIX-ish shell (PowerShell 5.1+, bash, zsh — all fine).
+
+### One-time setup
 
 ```bash
-npm install            # install deps
-node scripts/setup-dev.mjs  # one-shot: skip-worktree on content/live-signal.json
-npm run dev            # local dev server (rarely needed)
-npm run generate       # produce static .output/public
+git clone https://github.com/koshux/Portfolio.git
+cd Portfolio
+npm install
+node scripts/setup-dev.mjs   # marks content/live-signal.json skip-worktree
+```
+
+`setup-dev.mjs` runs `git update-index --skip-worktree` against
+`content/live-signal.json` so the **build-time** writes by
+`scripts/fetch-live-signal.mjs` don't pollute `git status` while you work.
+CI checkouts are ephemeral and unaffected.
+
+### Day-to-day commands
+
+```bash
+npm run dev            # Nuxt dev server with HMR (http://localhost:3000)
+npm run generate       # static build → .output/public
 npm run preview        # serve the generated output
 npm run typecheck      # nuxt typecheck (vue-tsc)
+npm run lint           # eslint (Nuxt + Vue rules)
 npm test               # unit + integration + e2e
 npm run test:unit      # vitest unit + component
 npm run test:int       # vitest + @nuxt/test-utils
 npm run test:e2e       # playwright against generated output
 ```
 
-### Live-signal chip
+> **AGENTS.md hard rule:** never run `npm run dev` from automation. For
+> verification, prefer `npm run generate && npm run preview`.
 
-The header chip ("commit · X days ago") is generated **at build time** by
-[`scripts/fetch-live-signal.mjs`](./scripts/fetch-live-signal.mjs), which
-hits the public GitHub events API and writes `content/live-signal.json`.
-The build never fails: every error path writes the unavailable fallback
-and the chip degrades to "GitHub · recent activity". See
-[ADR-001](./docs/decisions/ADR-001-live-signal-build-time.md).
+### Troubleshooting
+
+#### `Cannot find module '/css/tailwind.css'` on `npm run dev`
+
+This is a stale Nuxt cache, usually after switching between `dev` and
+`generate`, or after pulling a branch that touched `nuxt.config.ts` or
+`tailwind.config.js`. Wipe the build artefacts and restart:
+
+```bash
+# PowerShell
+Remove-Item -Recurse -Force .nuxt, .output, .data, node_modules/.cache -ErrorAction SilentlyContinue
+npm run dev
+
+# bash / zsh
+rm -rf .nuxt .output .data node_modules/.cache
+npm run dev
+```
+
+The CSS lives at [`app/assets/css/tailwind.css`](./app/assets/css/tailwind.css)
+and is registered in [`nuxt.config.ts`](./nuxt.config.ts) as
+`css: ['~/assets/css/tailwind.css']`. Nothing about that path is wrong —
+the cache is.
+
+#### Live-signal chip says "recent activity"
+
+The build-time fetch silently falls back when the GitHub API is rate-
+limited or offline. Set `GITHUB_TOKEN` (any classic PAT, no scopes
+needed) to lift the unauthenticated 60/h limit, or set
+`SKIP_LIVE_SIGNAL_FETCH=1` to skip the fetch entirely (deterministic for
+tests / offline work). See [ADR-001](./docs/decisions/ADR-001-live-signal-build-time.md).
+
+#### `EBUSY: resource busy or locked, rmdir '.output'`
+
+You have a `npm run preview` server still running. Stop it (Ctrl+C in
+its terminal) before re-running `generate`.
+
+### Live-signal chip — internals
+
+The header chip ("commit · X days ago · Malta · CEST") is generated **at
+build time** by [`scripts/fetch-live-signal.mjs`](./scripts/fetch-live-signal.mjs),
+which hits the public GitHub events API and writes
+`content/live-signal.json`. The build never fails: every error path
+writes the unavailable fallback and the chip degrades gracefully.
 
 | Env var | Effect |
 |---|---|
@@ -44,10 +110,7 @@ and the chip degrades to "GitHub · recent activity". See
 | `SKIP_LIVE_SIGNAL_FETCH=1` | Skip the API call entirely. Used by tests + CI to keep `content/live-signal.json` deterministic. |
 
 `content/live-signal.json` is **tracked** (with the unavailable
-placeholder) so fresh clones build out-of-the-box. Running
-`node scripts/setup-dev.mjs` after `npm install` applies
-`git update-index --skip-worktree` so subsequent build-time writes don't
-appear in `git status`. CI runs ephemeral checkouts and is unaffected.
+placeholder) so fresh clones build out-of-the-box.
 
 ### Editorial source for the CV
 
@@ -56,11 +119,36 @@ James' CV. `content/cv.md` carries only the frontmatter consumed by
 `@nuxt/content`. To update copy: edit the editorial file, then mirror the
 relevant frontmatter into `content/cv.md`.
 
-### Legacy site
+### Project structure
 
-The 2016–2018 static site lives under
-[`docs/legacy/website-2016-2018/`](./docs/legacy/website-2016-2018/) for
-reference only. Do not extend it — new work belongs under `app/`.
+```
+app/
+  assets/css/tailwind.css     # Tailwind entry — base + components + utilities
+  components/
+    Section/                  # Hero, Projects, Experience, Skills, Contact
+    Timeline/                 # Role / experience timeline pieces
+    Ui/                       # SkipLink, IconLink, ContactMenu, LiveSignal
+  composables/                # useCvContent, useLiveSignal, useMaltaClock
+  layouts/default.vue
+  pages/index.vue
+  types/cv.ts
+content/
+  cv.md                       # CV frontmatter consumed by @nuxt/content
+  live-signal.json            # Build-time GitHub event payload
+docs/
+  cv/cv.md                    # Editorial CV source of truth
+  journeys/  specs/  logs/  decisions/  sdlc/
+public/                       # Static passthrough (favicons, robots, og)
+scripts/
+  fetch-live-signal.mjs       # Pre-build GitHub API fetch
+  setup-dev.mjs               # One-shot dev environment bootstrap
+shared/content-schemas.ts     # Zod schemas for @nuxt/content collections
+tests/
+  unit/  integration/  e2e/
+.github/
+  instructions/  prompts/  agents/  skills/  workflows/
+.claude/                      # Claude Code reads AGENTS.md from root
+```
 
 ## SDLC at a glance
 
@@ -79,23 +167,6 @@ reference only. Do not extend it — new work belongs under `app/`.
 | ADRs | [docs/decisions/](./docs/decisions/) | Long-term decisions |
 
 Templates live alongside as `_TEMPLATE.md` in each folder.
-
-## Project structure
-
-```
-app/                  # Nuxt 4 source
-public/               # Static passthrough
-website/              # Legacy static site (read-only, kept for reference)
-docs/                 # Journeys, specs, logs, decisions
-tests/{unit,integration,e2e}
-.github/
-  instructions/       # File-scoped agent guidance
-  prompts/            # SDLC slash-commands
-  agents/             # Specialist subagents
-  skills/             # Bundled SDLC workflow
-  workflows/          # GitHub Actions
-.claude/              # Claude Code settings (reads AGENTS.md from root)
-```
 
 ## Deployment
 

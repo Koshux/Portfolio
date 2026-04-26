@@ -32,13 +32,17 @@ test.describe('home page — JavaScript disabled', () => {
     // (Intl.DateTimeFormat with timeZone: 'Europe/Malta') still renders.
     await expect(chip).toContainText(/CES?T/)
     // And the unavailable-fallback chip text is still visible (since the
-    // build seeded the placeholder JSON).
-    await expect(chip).toContainText(/GitHub · recent activity/)
+    // build seeded the placeholder JSON). Iteration-7 trimmed the visible
+    // "GitHub ·" prefix; the GitHub context now lives in aria-label.
+    await expect(chip).toContainText(/recent activity/)
+    await expect(chip).toHaveAttribute('aria-label', /GitHub/i)
   })
 
-  test('contact section still exposes mailto and LinkedIn', async ({ page }) => {
+  test('contact section still exposes the mailto primary CTA', async ({ page }) => {
     const contact = page.locator('#contact')
     await expect(contact.locator('a[href^="mailto:lanzonprojects@gmail.com"]')).toBeVisible()
-    await expect(contact.locator('a[href*="linkedin.com"]')).toBeVisible()
+    // Iteration-7: LinkedIn moved out of the contact section into the
+    // header ContactMenu. It must NOT live inside #contact anymore.
+    await expect(contact.locator('a[href*="linkedin.com"]')).toHaveCount(0)
   })
 })

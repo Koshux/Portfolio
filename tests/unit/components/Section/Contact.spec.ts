@@ -24,14 +24,21 @@ describe('Section/Contact', () => {
     expect(mailto.text()).toContain('lanzonprojects@gmail.com')
   })
 
-  it('renders the literal "CV available on request" line as plain text (not a link)', async () => {
+  it('renders the literal "Available on request" line as plain text (not a link)', async () => {
     const wrapper = await mountSuspended(Contact, { props: { contact } })
-    expect(wrapper.text()).toContain('CV available on request')
+    expect(wrapper.text()).toContain('Available on request')
     // The exact phrase must not appear inside any anchor element.
     const anchors = wrapper.findAll('a')
     for (const a of anchors) {
-      expect(a.text()).not.toContain('CV available on request')
+      expect(a.text()).not.toContain('Available on request')
     }
+  })
+
+  it('renders the dynamic-year copyright in place of a sitewide footer', async () => {
+    const wrapper = await mountSuspended(Contact, { props: { contact } })
+    const year = new Date().getFullYear().toString()
+    expect(wrapper.text()).toContain(`© ${year} James Lanzon`)
+    expect(wrapper.text()).toContain('All rights reserved')
   })
 
   it('renders no download anchors and no ?v= query strings', async () => {
@@ -41,10 +48,9 @@ describe('Section/Contact', () => {
     expect(html).not.toMatch(/\?v=/)
   })
 
-  it('renders a LinkedIn secondary link', async () => {
+  it('does not render a LinkedIn link in the contact section (header owns it)', async () => {
     const wrapper = await mountSuspended(Contact, { props: { contact } })
-    const link = wrapper.get('a[href="https://www.linkedin.com/in/jameslanzon"]')
-    expect(link.text()).toBe('LinkedIn')
+    expect(wrapper.html()).not.toMatch(/linkedin\.com/i)
   })
 
   it('does not render a GitHub link in the contact section (header owns it)', async () => {

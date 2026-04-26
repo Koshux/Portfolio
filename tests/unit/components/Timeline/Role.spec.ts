@@ -39,7 +39,7 @@ describe('Timeline/Role', () => {
     expect(wrapper.text()).toMatch(/2025.*–.*Present/)
   })
 
-  it('displays long bullets without truncation or line-clamp', async () => {
+  it('does not render bullets (intentionally hidden in iteration 1 polish)', async () => {
     const longBullet = 'x'.repeat(500)
     const wrapper = await mountSuspended(Role, {
       props: {
@@ -53,13 +53,11 @@ describe('Timeline/Role', () => {
         },
       },
     })
-    const html = wrapper.html()
-    expect(wrapper.text()).toContain(longBullet)
-    expect(html).not.toMatch(/line-clamp/)
-    expect(html).not.toMatch(/truncate/)
+    expect(wrapper.findAll('li')).toHaveLength(0)
+    expect(wrapper.text()).not.toContain(longBullet)
   })
 
-  it('renders one <li> per bullet', async () => {
+  it('renders no <li> elements regardless of bullet count', async () => {
     const wrapper = await mountSuspended(Role, {
       props: {
         role: {
@@ -72,6 +70,6 @@ describe('Timeline/Role', () => {
         },
       },
     })
-    expect(wrapper.findAll('li')).toHaveLength(3)
+    expect(wrapper.findAll('li')).toHaveLength(0)
   })
 })

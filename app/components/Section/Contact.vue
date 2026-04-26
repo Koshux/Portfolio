@@ -5,10 +5,12 @@ interface Props {
   contact: ContactBlock
 }
 
-// LinkedIn intentionally lives in the footer (persistent across pages).
-// The Contact section focuses on the primary action (email) plus
-// minimal supporting metadata.
 defineProps<Props>()
+
+// Copyright year is computed at render time so the static build picks up
+// the correct year on each deploy. Used in the contact aside in place of
+// a sitewide footer.
+const currentYear = new Date().getFullYear()
 </script>
 
 <template>
@@ -81,6 +83,9 @@ defineProps<Props>()
             </p>
             <p class="mt-2 text-base text-paper-white/80">Available on request</p>
           </div>
+          <p class="border-t border-paper-white/10 pt-5 text-xs text-paper-white/50">
+            &copy; {{ currentYear }} James Lanzon. All rights reserved.
+          </p>
         </aside>
       </div>
     </div>

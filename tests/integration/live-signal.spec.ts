@@ -20,9 +20,15 @@ import { readGeneratedHtml } from './_helpers/generated'
 
 const html = readGeneratedHtml()
 
-describe('live-signal — unavailable branch (default fixture)', () => {
-  it('renders the SSR fallback "GitHub · recent activity" string', () => {
-    expect(html).toContain('GitHub · recent activity')
+describe('live-signal — SSR chip (either branch)', () => {
+  it('renders the chip with the GitHub aria-label and visible content from one of the two branches', () => {
+    expect(html).toMatch(/aria-label="Latest GitHub activity"/)
+    const hasUnavailable = html.includes('recent activity')
+    // Commit-data branch: a `repo` like "Koshux/Portfolio" plus a
+    // relative-time phrase rendered by app/utils/relativeTime.ts.
+    const hasCommitData = /[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/.test(html)
+      && /(just now|ago|in \d)/.test(html)
+    expect(hasUnavailable || hasCommitData).toBe(true)
   })
 
   it('renders the role="status" + aria-live="polite" chip', () => {

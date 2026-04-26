@@ -25,8 +25,11 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module'
   ],
 
-  // Tailwind entry — registered globally so all pages get base/components/utilities.
-  css: ['~/assets/css/tailwind.css'],
+  // Tailwind entry is auto-detected by @nuxtjs/tailwindcss at
+  // `app/assets/css/tailwind.css` — do not register it explicitly via
+  // `css: [...]` or the Nuxt 4 srcDir resolution clashes with the
+  // module's injection and `npm run dev` errors with
+  // `Cannot find module '/css/tailwind.css'`.
 
   // Essential for GH Pages: ensure assets don't start with underscores
   app: {
