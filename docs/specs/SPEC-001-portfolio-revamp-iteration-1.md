@@ -1,29 +1,29 @@
----
+﻿---
 id: SPEC-001
-title: "Portfolio revamp — iteration 1 (single-page recruiter site)"
-status: approved
+title: "Portfolio revamp â€” iteration 1 (single-page recruiter site)"
+status: done
 created: 2026-04-26
 owner: "James Lanzon"
 journeys: [JNY-001]
 adrs: [ADR-001]
 ---
 
-# SPEC-001 — Portfolio revamp, iteration 1
+# SPEC-001 â€” Portfolio revamp, iteration 1
 
 ## Summary
 Implement the recruiter-optimised, single-page portfolio described in
 [JNY-001](../journeys/JNY-001-portfolio-revamp-iteration-1.md). The page
-renders five content blocks in order — **hero**, **overview**, **experience
-timeline**, **skills**, **contact / CTA** — from a single `@nuxt/content`
+renders five content blocks in order â€” **hero**, **overview**, **experience
+timeline**, **skills**, **contact / CTA** â€” from a single `@nuxt/content`
 document sourced from [content/cv.md](../../content/cv.md). The site is
 generated statically by Nuxt 4 (`nitro.preset = 'github-pages'`,
 `static: true`) and deployed to GitHub Pages via the existing
 `npm run generate` pipeline. The persistent header carries, in DOM order
-left → right, the brand/name, a **live-signal chip** (latest public commit
+left â†’ right, the brand/name, a **live-signal chip** (latest public commit
 across James' GitHub repos + current Malta time), a **GitHub icon link**,
 and an **email icon link**. Email (`lanzonprojects@gmail.com`) is the
 primary CTA via `mailto:`; LinkedIn is a secondary footer link. The CV is
-**not** downloadable in iteration 1 — the contact section shows a single
+**not** downloadable in iteration 1 â€” the contact section shows a single
 "CV available on request" line; [docs/cv/cv.md](../../docs/cv/cv.md) is
 retained only as the editorial source for `content/cv.md` frontmatter.
 The live-signal data is injected at **build time** by a pregenerate
@@ -38,19 +38,19 @@ hierarchy), and be interactive in under 1.8 s on simulated 4G mobile.
 The contract. Each is verifiable by an automated test or scripted manual
 check (see Test plan).
 
-- [ ] **AC-1** — Above the fold on a 360 × 600 mobile viewport **and** a
-      1280 × 800 desktop viewport, the hero shows: James' name, his
+- [ ] **AC-1** â€” Above the fold on a 360 Ã— 600 mobile viewport **and** a
+      1280 Ã— 800 desktop viewport, the hero shows: James' name, his
       current title (from content), his current employer (European
       Commission), and the tagline. No scrolling required to reveal any
       of those four.
-- [ ] **AC-2** — A primary email contact link
+- [ ] **AC-2** â€” A primary email contact link
       (`mailto:lanzonprojects@gmail.com`) is reachable from any scroll
-      position in ≤ 10 s of interaction. Implementation: a persistent
+      position in â‰¤ 10 s of interaction. Implementation: a persistent
       header email icon CTA (icon-only with `aria-label="Email James"`
       and an `sr-only` text label, both mobile and desktop), plus a hero
       CTA, plus the contact section.
-- [ ] **AC-3** — The persistent header includes, in DOM order
-      left → right: brand/name on the left; on the right a
+- [ ] **AC-3** â€” The persistent header includes, in DOM order
+      left â†’ right: brand/name on the left; on the right a
       `LiveSignal` chip, then a GitHub icon link
       (`https://github.com/jameslanzon`), then an email icon link
       (`mailto:lanzonprojects@gmail.com`). All three are reachable from
@@ -59,27 +59,27 @@ check (see Test plan).
       `position: sticky; top: 0`) so the live-signal chip, GitHub icon,
       and email icon are reachable from any scroll position without
       re-scrolling.
-- [ ] **AC-4** — Both icon links follow the icon-only-with-`aria-label`
+- [ ] **AC-4** â€” Both icon links follow the icon-only-with-`aria-label`
       pattern: the GitHub link has `aria-label="James' GitHub profile"`
       and an `sr-only` text label; the email link has
       `aria-label="Email James"` and an `sr-only` text label; the SVG
       icon inside each link has `aria-hidden="true"` and
       `focusable="false"`. External links (GitHub) carry
       `rel="noopener noreferrer"` and `target="_blank"`.
-- [ ] **AC-5** — The full experience history (every role in
+- [ ] **AC-5** â€” The full experience history (every role in
       `content/cv.md` under `experience`) renders as a single timeline on
       `/`, sorted reverse-chronologically **at render time** by `start`
       (ISO string compare; year-only `start` values are normalised to
       `${year}-01` for sorting). No modals, no accordions collapsed by
       default, no links to other routes.
-- [ ] **AC-6** — The contact section shows the email CTA **and** a
-      single plain-text line "CV available on request" — no link, no
+- [ ] **AC-6** â€” The contact section shows the email CTA **and** a
+      single plain-text line "CV available on request" â€” no link, no
       `mailto:` for the CV, no download buttons, no reference to
       `public/cv/`.
-- [ ] **AC-7** — At build time, `scripts/fetch-live-signal.mjs` runs
+- [ ] **AC-7** â€” At build time, `scripts/fetch-live-signal.mjs` runs
       (via the `prebuild` and `pregenerate` npm hooks) and writes
       `content/live-signal.json` matching the `liveSignal` schema in
-      §Data shapes. The script writes a fallback object
+      Â§Data shapes. The script writes a fallback object
       (`{ unavailable: true, fetchedAt: <ISO> }`) and exits `0` on any
       non-200 response, rate-limit (HTTP 403 with
       `X-RateLimit-Remaining: 0`), network error, or malformed payload.
@@ -87,44 +87,44 @@ check (see Test plan).
       `SKIP_LIVE_SIGNAL_FETCH=1`: when that env var is set the script
       exits `0` immediately without reading or writing
       `content/live-signal.json`, allowing tests to pre-seed a fixture.
-- [ ] **AC-8** — The header live-signal chip renders into the static
+- [ ] **AC-8** â€” The header live-signal chip renders into the static
       HTML for `/` with **either** (a) the most recent commit's repo
       name, a relative timestamp (e.g. "3 days ago"), and the Malta
       time fallback label, **or** (b) the unavailable fallback string
-      "GitHub · recent activity" plus the Malta time fallback label
+      "GitHub Â· recent activity" plus the Malta time fallback label
       when `unavailable === true`. Verified by an integration test
       against the generated HTML.
-- [ ] **AC-9** — When JavaScript is enabled, the Malta time portion of
+- [ ] **AC-9** â€” When JavaScript is enabled, the Malta time portion of
       the live-signal chip updates every second (driven by the
       `useMaltaClock` composable, `setInterval(1000)`); when JavaScript
-      is disabled, the SSR-rendered "Malta · CEST" (or current short
+      is disabled, the SSR-rendered "Malta Â· CEST" (or current short
       offset) label remains visible and is the only Malta time shown.
       The Malta clock interval is disposed via `onScopeDispose`.
-- [ ] **AC-10** — The live-signal chip is purely informational. It is
+- [ ] **AC-10** â€” The live-signal chip is purely informational. It is
       wrapped with `role="status"` and `aria-live="polite"` so screen
       readers announce JS-side updates politely. It is not a link and
       is not in the focus order.
-- [ ] **AC-11** — When `live-signal.json.unavailable === true`, the
+- [ ] **AC-11** â€” When `live-signal.json.unavailable === true`, the
       chip MUST NOT render any commit date, repo name, or hard-coded
       placeholder date. It shows only the fallback string plus the
       Malta time portion.
-- [ ] **AC-12** — The home route, served from the generated static
+- [ ] **AC-12** â€” The home route, served from the generated static
       output, reaches Lighthouse **Time to Interactive < 1800 ms** under
       the `mobile` configuration with throttling preset `Slow 4G`,
       measured by `playwright-lighthouse` inside the existing e2e suite.
-- [ ] **AC-13** — `/` passes `axe-core` automated accessibility checks
+- [ ] **AC-13** â€” `/` passes `axe-core` automated accessibility checks
       at WCAG 2.2 AA level with **zero violations** of `serious` or
       `critical` severity, including the `bypass`,
       `landmark-one-main`, `region`, and `heading-order` rules.
       `moderate` violations must each have a recorded justification in
       `tests/e2e/JNY-001-recruiter-scan.spec.ts`.
-- [ ] **AC-14** — With JavaScript disabled in the browser, the
+- [ ] **AC-14** â€” With JavaScript disabled in the browser, the
       generated `index.html` for `/` renders the hero, overview,
       experience timeline, skills, and contact sections, **and** the
       live-signal chip is present with its SSR fallback content (per
       AC-8 / AC-9). All `mailto:` links remain functional. No section
       depends on client-side hydration to become visible or readable.
-- [ ] **AC-15** — Every content element present at desktop ≥ 1280 px is
+- [ ] **AC-15** â€” Every content element present at desktop â‰¥ 1280 px is
       also present at mobile 360 px (no `hidden md:block` or
       `md:hidden` rules that hide content; layout-only hiding such as a
       decorative svg is allowed and must be marked `aria-hidden="true"`).
@@ -134,23 +134,23 @@ check (see Test plan).
       header links named "Email James" and "James' GitHub profile"; and
       a `role="status"` element (the live-signal chip). Tests use
       `getByRole` / `getByLabel`.
-- [ ] **AC-16** — The string `lanzonprojects@gmail.com` is the **only**
+- [ ] **AC-16** â€” The string `lanzonprojects@gmail.com` is the **only**
       personal email address rendered anywhere in the generated HTML for
       `/`. The legacy `jameslanzon@gmail.com` does not appear in the
       rendered site.
-- [ ] **AC-17** — The contact section / footer includes a labelled
+- [ ] **AC-17** â€” The contact section / footer includes a labelled
       secondary link to LinkedIn (GitHub now lives in the header per
-      AC-3 — it is **not** duplicated in the contact section).
-- [ ] **AC-18** — No `<img>`, `<NuxtImg>`, `<NuxtPicture>`, or
+      AC-3 â€” it is **not** duplicated in the contact section).
+- [ ] **AC-18** â€” No `<img>`, `<NuxtImg>`, `<NuxtPicture>`, or
       `background-image` referencing a portrait of James appears in the
       hero or above the experience section.
-- [ ] **AC-19** — All visible copy (hero headline, overview prose, role
+- [ ] **AC-19** â€” All visible copy (hero headline, overview prose, role
       titles, role bullets, skills list, contact line, "CV available on
       request" line) is sourced from a `@nuxt/content` query against
       `content/cv.md`. Components contain no hard-coded copy beyond
       ARIA labels, the live-signal fallback string, and structural
       punctuation.
-- [ ] **AC-20** — All Tailwind transition/animation utilities are
+- [ ] **AC-20** â€” All Tailwind transition/animation utilities are
       written behind the `motion-safe:` modifier (or otherwise no-op)
       when `prefers-reduced-motion: reduce` is set. Verified by an e2e
       test that emulates `Reduce motion` and asserts no transitions or
@@ -158,36 +158,36 @@ check (see Test plan).
       `animation-duration` is `0s` on the relevant elements). The Malta
       clock interval still ticks under reduced motion (it is data, not
       animation).
-- [ ] **AC-21** — The default layout exposes a visible-on-focus "Skip to
+- [ ] **AC-21** â€” The default layout exposes a visible-on-focus "Skip to
       content" link as the **first** focusable element, plus
       `<header>`, `<nav>` (when applicable), `<main id="main">`, and
       `<footer>` landmarks. Asserted by axe (`bypass`,
       `landmark-one-main`, `region`) and by a Playwright keyboard test:
-      Tab once → skip link visible; Enter → focus on `#main`. The
+      Tab once â†’ skip link visible; Enter â†’ focus on `#main`. The
       `<main>` element has `tabindex="-1"` so the skip link can move
-      focus to it programmatically; after Tab → Enter on the skip link,
+      focus to it programmatically; after Tab â†’ Enter on the skip link,
       `document.activeElement` is the `<main>` element.
-- [ ] **AC-22** — The generated HTML for `/` contains the following
+- [ ] **AC-22** â€” The generated HTML for `/` contains the following
       meta tags via `useSeoMeta`: `og:title`, `og:description`,
       `og:image`, `og:url`, `twitter:card="summary_large_image"`,
       `twitter:image`. The `og:image` resolves to the absolute URL
-      `https://jameslanzon.com/og/og-image.png` (1200 × 630), which
+      `https://jameslanzon.com/og/og-image.png` (1200 Ã— 630), which
       exists as a committed static asset in `public/og/`.
-- [ ] **AC-23** — A favicon set is present in `public/`
-      (`favicon.ico`, `favicon.svg`, `apple-touch-icon.png` (180 × 180),
+- [ ] **AC-23** â€” A favicon set is present in `public/`
+      (`favicon.ico`, `favicon.svg`, `apple-touch-icon.png` (180 Ã— 180),
       `favicon-32.png`, `favicon-16.png`, `site.webmanifest`) and
       referenced from `nuxt.config.ts > app.head.link`. The generated
       HTML contains the corresponding `<link rel="icon">`,
       `<link rel="apple-touch-icon">`, and `<link rel="manifest">`
       tags.
-- [ ] **AC-24** — The generated HTML root element has `lang="en"`.
-- [ ] **AC-25** — Heading hierarchy is exactly: `H1` = James' name in
+- [ ] **AC-24** â€” The generated HTML root element has `lang="en"`.
+- [ ] **AC-25** â€” Heading hierarchy is exactly: `H1` = James' name in
       Hero; `H2` = each section heading ("Experience", "Skills",
       "Contact"); `H3` = role title in `Timeline/Role.vue`; `H3` = each
       skill group label in `Section/Skills.vue`. No heading levels are
       skipped. Asserted by the axe `heading-order` rule and by a unit
       assertion on the rendered DOM.
-- [ ] **AC-26** — The generated artefact contains
+- [ ] **AC-26** â€” The generated artefact contains
       `.output/public/CNAME` whose contents equal `jameslanzon.com`
       (with optional trailing newline) so GitHub Pages serves the
       apex domain.
@@ -196,7 +196,7 @@ check (see Test plan).
 - Blog, projects/case studies, testimonials, dark-mode toggle,
   analytics, cookie banner, contact form, command palette / motion
   toggle UI, animations beyond Tailwind transition utilities, i18n.
-- A CMS or authoring UI for the CV — `content/cv.md` is edited by hand,
+- A CMS or authoring UI for the CV â€” `content/cv.md` is edited by hand,
   using `docs/cv/cv.md` as the editorial source.
 - Re-styling or extending the legacy site. The legacy `website/`
   directory and root `index.html` are removed/relocated as cleanup
@@ -217,31 +217,31 @@ check (see Test plan).
 | Path | Change |
 |---|---|
 | `app/app.vue` | Replace `<NuxtWelcome />` with `<NuxtLayout><NuxtPage /></NuxtLayout>`. |
-| `app/layouts/default.vue` | **New.** Page chrome: skip-link (first focusable), a sticky `<header class="sticky top-0 z-40 ...">` with an opaque/blur background and a bottom border for separation against scrolled content; the header contains brand/name on the left and (left → right) `LiveSignal` + GitHub `IconLink` + email `IconLink` on the right; `<main id="main" tabindex="-1">` slot (the `tabindex="-1"` lets the skip link move focus there programmatically); `<footer>` with secondary LinkedIn link + copyright. |
+| `app/layouts/default.vue` | **New.** Page chrome: skip-link (first focusable), a sticky `<header class="sticky top-0 z-40 ...">` with an opaque/blur background and a bottom border for separation against scrolled content; the header contains brand/name on the left and (left â†’ right) `LiveSignal` + GitHub `IconLink` + email `IconLink` on the right; `<main id="main" tabindex="-1">` slot (the `tabindex="-1"` lets the skip link move focus there programmatically); `<footer>` with secondary LinkedIn link + copyright. |
 | `app/pages/index.vue` | **New.** Home page. Queries `content/cv.md` via `useAsyncData` + `queryCollection('cv').first()`; renders the five sections; calls `useSeoMeta` (incl. OG/Twitter). |
-| `app/components/Section/Hero.vue` | **New.** Renders `H1` name, current title, current employer, tagline, hero CTA → `#contact`. The hero CTA carries `data-testid="hero-cta"` so the reduced-motion e2e test (AC-20) can pin its assertion to a stable element. |
+| `app/components/Section/Hero.vue` | **New.** Renders `H1` name, current title, current employer, tagline, hero CTA â†’ `#contact`. The hero CTA carries `data-testid="hero-cta"` so the reduced-motion e2e test (AC-20) can pin its assertion to a stable element. |
 | `app/components/Section/Overview.vue` | **New.** Renders the prose `overview` block as plain paragraphs. |
 | `app/components/Section/Experience.vue` | **New.** Renders the `experience[]` array as a semantic `<ol>` reverse-chronological timeline. Sorts at render time (see `app/utils/sortRoles.ts`). |
 | `app/components/Section/Skills.vue` | **New.** Renders `skills[]` as a grouped list with `H3` per group. |
 | `app/components/Section/Contact.vue` | **New.** Renders the email CTA, the plain-text line "CV available on request" (no link, no `mailto:` for the CV, no download buttons), and a secondary LinkedIn link. |
 | `app/components/Timeline/Role.vue` | **New.** Single role card with `H3` title, organisation, dates, bullets. |
 | `app/components/Ui/IconLink.vue` | **New.** Generic icon-only link. Props: `href: string`, `ariaLabel: string`, `srLabel: string`, `external?: boolean`. Renders `<a>` with `aria-label`, an icon slot marked `aria-hidden="true"` / `focusable="false"`, and an `sr-only` text label. When `external`, emits `target="_blank" rel="noopener noreferrer"`. Reused by the header for GitHub and email. |
-| `app/components/Ui/LiveSignal.vue` | **New.** Renders the live-signal chip wrapped in `<div role="status" aria-live="polite">`. Pulls commit data via `useLiveSignal()` and Malta time via `useMaltaClock()`. SSR fallback: when `unavailable === true`, renders the string "GitHub · recent activity"; otherwise renders `${repo} · ${relativeTime(timestamp)}` (the commit message is **not** rendered — see schema). The Malta time portion uses `<ClientOnly fallback="Malta · CEST">` (the fallback string is computed at SSG time via `Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Malta', timeZoneName: 'short' })` and at SSG time the fallback may resolve to either `"Malta · CET"` or `"Malta · CEST"` depending on DST; tests assert the regex `/Malta · CES?T/`). Not a link, not in focus order. |
+| `app/components/Ui/LiveSignal.vue` | **New.** Renders the live-signal chip wrapped in `<div role="status" aria-live="polite">`. Pulls commit data via `useLiveSignal()` and Malta time via `useMaltaClock()`. SSR fallback: when `unavailable === true`, renders the string "GitHub Â· recent activity"; otherwise renders `${repo} Â· ${relativeTime(timestamp)}` (the commit message is **not** rendered â€” see schema). The Malta time portion uses `<ClientOnly fallback="Malta Â· CEST">` (the fallback string is computed at SSG time via `Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Malta', timeZoneName: 'short' })` and at SSG time the fallback may resolve to either `"Malta Â· CET"` or `"Malta Â· CEST"` depending on DST; tests assert the regex `/Malta Â· CES?T/`). Not a link, not in focus order. |
 | `app/components/Ui/SkipLink.vue` | **New.** First focusable element in the layout; targets `#main`. Visible only on focus. |
 | `app/composables/useCvContent.ts` | **New.** Wraps `useAsyncData` + `queryCollection('cv').first()`; returns typed refs. |
-| `app/composables/useLiveSignal.ts` | **New.** Wraps `queryCollection('liveSignal').first()`; returns a typed `Ref<LiveSignal>` (the discriminated union from the schema below). Pure data composable — no fetch. |
+| `app/composables/useLiveSignal.ts` | **New.** Wraps `queryCollection('liveSignal').first()`; returns a typed `Ref<LiveSignal>` (the discriminated union from the schema below). Pure data composable â€” no fetch. |
 | `app/composables/useMaltaClock.ts` | **New.** Returns `Ref<string>` of current `Europe/Malta` time formatted via `Intl.DateTimeFormat`. Registers a `setInterval(1000)` and disposes it via `onScopeDispose`. SSR-safe: on the server it returns the current value once and registers no interval. |
-| `app/utils/sortRoles.ts` | **New.** Pure helper: normalises `start` (year-only → `${year}-01`) and returns `Role[]` sorted reverse-chronologically. Independently unit-tested. |
+| `app/utils/sortRoles.ts` | **New.** Pure helper: normalises `start` (year-only â†’ `${year}-01`) and returns `Role[]` sorted reverse-chronologically. Independently unit-tested. |
 | `app/utils/relativeTime.ts` | **New.** Pure helper: `(iso: string, now?: Date) => string` returning English relative time ("3 days ago", "just now"). Used by `LiveSignal.vue`. Unit-tested. |
 | `app/assets/css/tailwind.css` | **New.** `@tailwind` directives + a `prose` override layer for the timeline. |
 | `tailwind.config.js` | Update `content` globs to include `app/**/*.{vue,ts}`; add brand colour token; set `theme.fontFamily.sans` to the `@nuxt/fonts`-managed font (e.g. `Inter`). |
 | `nuxt.config.ts` | Register `app/assets/css/tailwind.css`; verify `app.htmlAttrs.lang = 'en'` (already set); add `app.head.link` entries for the favicon set; verify `@nuxt/fonts` is in `modules` (already set). |
-| `content.config.ts` | Add a `cv` collection (`type: 'page'`) with the schema in §Data shapes; add a `liveSignal` data collection (`type: 'data'`, `source: 'live-signal.json'`, discriminated-union schema); keep existing `content` collection. |
-| `content/cv.md` | **New.** Single document with structured frontmatter (see §Data shapes), including `updated` ISO date, hero tagline, and `og` block. **No `cv:` block.** Body is empty — components read frontmatter only. Editorial source remains [docs/cv/cv.md](../../docs/cv/cv.md). |
-| `content/live-signal.json` | **New, committed and tracked** with the placeholder `{ "unavailable": true, "fetchedAt": "1970-01-01T00:00:00Z" }`. `nuxt prepare` is satisfied by this committed placeholder — it parses as the `unavailable` branch of the discriminated union. The file is overwritten on every `npm run build` / `npm run generate` by the prebuild/pregenerate hook (locally and in CI) but **must never be committed back**. Local clones run `git update-index --skip-worktree content/live-signal.json` (one-shot, applied by `scripts/setup-dev.mjs`) so post-build modifications never appear in `git status`. CI runs ephemeral checkouts so this is a no-op there. |
-| `scripts/fetch-live-signal.mjs` | **New, Node 20 ESM.** Honours `process.env.SKIP_LIVE_SIGNAL_FETCH`: when set to `1` the script exits `0` immediately without reading or writing `content/live-signal.json` (used by integration tests that pre-seed the JSON). Otherwise fetches `https://api.github.com/users/jameslanzon/events/public?per_page=30`, picks the most recent `PushEvent`, extracts `{ repo, sha (short, 7 chars), timestamp (ISO), fetchedAt (ISO) }` (the commit message is **not** captured — the chip never renders it, so omitting it shrinks the attack surface), validates against the schema, writes `content/live-signal.json`. On any failure (non-200, HTTP 403 + `X-RateLimit-Remaining: 0`, network error, `JSON.parse` failure, no `PushEvent` in the page) writes `{ unavailable: true, fetchedAt: <ISO> }` and exits `0`. Honours `process.env.GITHUB_TOKEN` if set (sends `Authorization: Bearer …` to lift the 60/h unauthenticated rate limit). Uses global `fetch` (Node 20+). Logs a single line to stdout describing the outcome (`fetched <repo>@<sha>`, `skipped (SKIP_LIVE_SIGNAL_FETCH=1)`, or `unavailable: <reason>`). |
+| `content.config.ts` | Add a `cv` collection (`type: 'page'`) with the schema in Â§Data shapes; add a `liveSignal` data collection (`type: 'data'`, `source: 'live-signal.json'`, discriminated-union schema); keep existing `content` collection. |
+| `content/cv.md` | **New.** Single document with structured frontmatter (see Â§Data shapes), including `updated` ISO date, hero tagline, and `og` block. **No `cv:` block.** Body is empty â€” components read frontmatter only. Editorial source remains [docs/cv/cv.md](../../docs/cv/cv.md). |
+| `content/live-signal.json` | **New, committed and tracked** with the placeholder `{ "unavailable": true, "fetchedAt": "1970-01-01T00:00:00Z" }`. `nuxt prepare` is satisfied by this committed placeholder â€” it parses as the `unavailable` branch of the discriminated union. The file is overwritten on every `npm run build` / `npm run generate` by the prebuild/pregenerate hook (locally and in CI) but **must never be committed back**. Local clones run `git update-index --skip-worktree content/live-signal.json` (one-shot, applied by `scripts/setup-dev.mjs`) so post-build modifications never appear in `git status`. CI runs ephemeral checkouts so this is a no-op there. |
+| `scripts/fetch-live-signal.mjs` | **New, Node 20 ESM.** Honours `process.env.SKIP_LIVE_SIGNAL_FETCH`: when set to `1` the script exits `0` immediately without reading or writing `content/live-signal.json` (used by integration tests that pre-seed the JSON). Otherwise fetches `https://api.github.com/users/jameslanzon/events/public?per_page=30`, picks the most recent `PushEvent`, extracts `{ repo, sha (short, 7 chars), timestamp (ISO), fetchedAt (ISO) }` (the commit message is **not** captured â€” the chip never renders it, so omitting it shrinks the attack surface), validates against the schema, writes `content/live-signal.json`. On any failure (non-200, HTTP 403 + `X-RateLimit-Remaining: 0`, network error, `JSON.parse` failure, no `PushEvent` in the page) writes `{ unavailable: true, fetchedAt: <ISO> }` and exits `0`. Honours `process.env.GITHUB_TOKEN` if set (sends `Authorization: Bearer â€¦` to lift the 60/h unauthenticated rate limit). Uses global `fetch` (Node 20+). Logs a single line to stdout describing the outcome (`fetched <repo>@<sha>`, `skipped (SKIP_LIVE_SIGNAL_FETCH=1)`, or `unavailable: <reason>`). |
 | `scripts/setup-dev.mjs` | **New, Node 20 ESM.** One-shot helper for fresh clones: runs `git update-index --skip-worktree content/live-signal.json` so locally-regenerated live-signal output never appears in `git status`. Idempotent. Documented in [README.md](../../README.md). |
-| `public/og/og-image.png` | **New, committed.** 1200 × 630 social card. If owner-supplied artwork is unavailable at implementation time, the implementer creates a temporary SVG-rendered-to-PNG carrying the tagline. |
+| `public/og/og-image.png` | **New, committed.** 1200 Ã— 630 social card. If owner-supplied artwork is unavailable at implementation time, the implementer creates a temporary SVG-rendered-to-PNG carrying the tagline. |
 | `public/favicon.ico` / `favicon.svg` / `favicon-16.png` / `favicon-32.png` / `apple-touch-icon.png` / `site.webmanifest` | **New, committed.** Full favicon set. |
 | `public/CNAME` | **New, committed** (moved from repo root). Contains `jameslanzon.com`. The repo-root `CNAME` is removed once `public/CNAME` is in place. |
 | `public/.nojekyll` | **New.** Zero-byte file. **Justification:** GitHub Pages runs Jekyll by default and strips files starting with `_` or `.`. While `app.buildAssetsDir = 'assets'` covers Nuxt's own outputs, future modules (`@nuxt/content` payloads, `@nuxt/image` IPX, etc.) may emit `_`-prefixed files. `.nojekyll` is a 0-byte safety net. |
@@ -265,18 +265,18 @@ check (see Test plan).
 | `tests/unit/components/Ui/LiveSignal.spec.ts` | **New.** Renders both states (commit-data and `unavailable: true`); asserts `role="status"` + `aria-live="polite"`; asserts that with `unavailable: true` no commit date or repo name appears (AC-11); asserts SSR-only render path produces the static Malta fallback string. |
 | `tests/unit/components/Ui/SkipLink.spec.ts` | **New.** |
 | `tests/integration/pages/head.spec.ts` | **New.** OG/Twitter meta tags, favicon `<link>` set, `<link rel="manifest">`, `<html lang="en">`, document title. |
-| `tests/integration/pages/landmarks.spec.ts` | **New.** Skip link is first focusable; `<header>`, `<main id="main" tabindex="-1">`, `<footer>` landmarks present; heading order `H1 → H2 → H3` with no level skipped; sticky header position (`getComputedStyle(headerEl).position === 'sticky'`); header DOM order is brand → LiveSignal → GitHub IconLink → email IconLink. |
+| `tests/integration/pages/landmarks.spec.ts` | **New.** Skip link is first focusable; `<header>`, `<main id="main" tabindex="-1">`, `<footer>` landmarks present; heading order `H1 â†’ H2 â†’ H3` with no level skipped; sticky header position (`getComputedStyle(headerEl).position === 'sticky'`); header DOM order is brand â†’ LiveSignal â†’ GitHub IconLink â†’ email IconLink. |
 | `tests/integration/pages/content.spec.ts` | **New.** Generated HTML contains every role title from the fixture in correct order; `lanzonprojects@gmail.com` appears and `jameslanzon@gmail.com` does not; the live-signal `role="status"` element is present. |
 | `tests/integration/pages/cname.spec.ts` | **New.** After `nuxt generate`, `.output/public/CNAME` exists with the contents `jameslanzon.com`. |
 | `tests/integration/content/cv-schema.spec.ts` | **New.** Validates `content/cv.md` against the Zod schema. |
 | `tests/integration/live-signal.spec.ts` | **New.** Uses `@nuxt/test-utils` `setup()` (which does **not** invoke npm lifecycle hooks). The test writes a fixture JSON to `content/live-signal.json` before mount and runs the build with `SKIP_LIVE_SIGNAL_FETCH=1` so the prebuild/pregenerate hook is a no-op and the seeded fixture is not overwritten. Asserts the chip text appears in the static `index.html`. Runs both branches (commit data + unavailable). |
-| `tests/e2e/JNY-001-recruiter-scan.spec.ts` | **New.** Full journey across mobile (360 × 600) + desktop (1280 × 800) projects: hero above fold; header GitHub icon resolves to a 200 from `https://github.com/jameslanzon`; email icon `href` starts with `mailto:`; live-signal chip visible above the fold from any scroll position; axe scan; skip-link keyboard test; Lighthouse TTI; reduced-motion emulation. |
+| `tests/e2e/JNY-001-recruiter-scan.spec.ts` | **New.** Full journey across mobile (360 Ã— 600) + desktop (1280 Ã— 800) projects: hero above fold; header GitHub icon resolves to a 200 from `https://github.com/jameslanzon`; email icon `href` starts with `mailto:`; live-signal chip visible above the fold from any scroll position; axe scan; skip-link keyboard test; Lighthouse TTI; reduced-motion emulation. |
 | `tests/e2e/no-js.spec.ts` | **New.** Dedicated JS-disabled spec covering AC-14 (five sections + live-signal SSR fallback present). |
-| `playwright.config.ts` | Set `webServer.command = 'npm run generate && npm run preview'` so a fresh-clone `npm run test:e2e` produces `.output/public` and serves it from a single source of truth (Playwright handles startup); add a `mobile` project at 360 × 600 and a `desktop` project at 1280 × 800. |
+| `playwright.config.ts` | Set `webServer.command = 'npm run generate && npm run preview'` so a fresh-clone `npm run test:e2e` produces `.output/public` and serves it from a single source of truth (Playwright handles startup); add a `mobile` project at 360 Ã— 600 and a `desktop` project at 1280 Ã— 800. |
 
 ### Data shapes
 
-#### `content.config.ts` — new `cv` and `liveSignal` collections
+#### `content.config.ts` â€” new `cv` and `liveSignal` collections
 
 ```ts
 import { defineCollection, defineContentConfig, z } from '@nuxt/content'
@@ -354,17 +354,17 @@ export default defineContentConfig({
 
 ```yaml
 ---
-title: "James Lanzon — UX Architect"
+title: "James Lanzon â€” UX Architect"
 description: "UX Architect & Accessibility Expert at the European Commission. Senior full-stack engineer based in Malta."
 updated: "2026-04-26"
 hero:
   name: "James Lanzon"
   title: "UX Architect & Accessibility Expert"
   employer: "European Commission"
-  tagline: "Architecting accessible, scalable systems — from fintech to the European Commission. JavaScript, UX, DX, standardisation."
+  tagline: "Architecting accessible, scalable systems â€” from fintech to the European Commission. JavaScript, UX, DX, standardisation."
 overview: |
   James Lanzon is a UX Architect & Accessibility Expert with experience across
-  Fintech, Energy, and the EU public sector …
+  Fintech, Energy, and the EU public sector â€¦
 experience:
   - title: "Application / Cloud Architect"
     organisation: "European Commission (DG-EAC)"
@@ -379,7 +379,7 @@ experience:
     start: "2023-01"
     end: "2025-01"
     bullets: [...]
-  # …all roles from docs/cv/cv.md (sort is also enforced at render time)
+  # â€¦all roles from docs/cv/cv.md (sort is also enforced at render time)
 skills:
   - label: "Engineering"
     items: ["TypeScript", "Vue 3 / Nuxt 4", "Node.js / AdonisJS", "PostgreSQL", "Redis"]
@@ -404,7 +404,7 @@ og:
 
 (The body of the file is intentionally empty; everything is frontmatter so
 components can render typed fields without `<ContentRenderer>`. There is
-**no** `cv:` block — the CV is not downloadable in iteration 1.)
+**no** `cv:` block â€” the CV is not downloadable in iteration 1.)
 
 #### `content/live-signal.json` (committed placeholder)
 
@@ -416,7 +416,7 @@ Committed and tracked. `nuxt prepare` is satisfied by this placeholder (it
 parses as the `unavailable` branch of the discriminated union). Overwritten
 on every `npm run build` / `npm run generate` by
 `scripts/fetch-live-signal.mjs`, both locally and in CI. Local clones run
-`scripts/setup-dev.mjs` once — it applies
+`scripts/setup-dev.mjs` once â€” it applies
 `git update-index --skip-worktree content/live-signal.json` so post-build
 changes never appear in `git status` and never get committed back.
 
@@ -477,46 +477,46 @@ function useMaltaClock(): Ref<string>
 
 ### Routing / pages
 
-- `/` — `app/pages/index.vue` (the only route in iteration 1).
+- `/` â€” `app/pages/index.vue` (the only route in iteration 1).
 - No dynamic routes. No catch-all.
 - 404: existing `package.json` post-`generate` step copies
-  `index.html` → `404.html`. Unchanged.
+  `index.html` â†’ `404.html`. Unchanged.
 
 ### Component tree
 
 ```
 app.vue
-└── layouts/default.vue
-    ├── Ui/SkipLink           (first focusable; targets #main)
-    ├── <header>
-    │   ├── (brand/name link, left)
-    │   └── (right cluster, in DOM order)
-    │       ├── Ui/LiveSignal             (role="status" aria-live="polite")
-    │       ├── Ui/IconLink (GitHub)      (external)
-    │       └── Ui/IconLink (email)
-    ├── <main id="main">
-    │   └── pages/index.vue
-    │       ├── Section/Hero
-    │       ├── Section/Overview
-    │       ├── Section/Experience
-    │       │   └── Timeline/Role  (×N)
-    │       ├── Section/Skills
-    │       └── Section/Contact
-    │           ├── Ui/IconLink (email)   (same component as the header)
-    │           ├── "CV available on request" (plain text, not a link)
-    │           └── (LinkedIn secondary link)
-    └── <footer>              (copyright + LinkedIn secondary link)
+â””â”€â”€ layouts/default.vue
+    â”œâ”€â”€ Ui/SkipLink           (first focusable; targets #main)
+    â”œâ”€â”€ <header>
+    â”‚   â”œâ”€â”€ (brand/name link, left)
+    â”‚   â””â”€â”€ (right cluster, in DOM order)
+    â”‚       â”œâ”€â”€ Ui/LiveSignal             (role="status" aria-live="polite")
+    â”‚       â”œâ”€â”€ Ui/IconLink (GitHub)      (external)
+    â”‚       â””â”€â”€ Ui/IconLink (email)
+    â”œâ”€â”€ <main id="main">
+    â”‚   â””â”€â”€ pages/index.vue
+    â”‚       â”œâ”€â”€ Section/Hero
+    â”‚       â”œâ”€â”€ Section/Overview
+    â”‚       â”œâ”€â”€ Section/Experience
+    â”‚       â”‚   â””â”€â”€ Timeline/Role  (Ã—N)
+    â”‚       â”œâ”€â”€ Section/Skills
+    â”‚       â””â”€â”€ Section/Contact
+    â”‚           â”œâ”€â”€ Ui/IconLink (email)   (same component as the header)
+    â”‚           â”œâ”€â”€ "CV available on request" (plain text, not a link)
+    â”‚           â””â”€â”€ (LinkedIn secondary link)
+    â””â”€â”€ <footer>              (copyright + LinkedIn secondary link)
 ```
 
 ### State / composables
 
-- `useCvContent()` — single source of truth for the CV page. Wraps
+- `useCvContent()` â€” single source of truth for the CV page. Wraps
   `useAsyncData('cv', () => queryCollection('cv').first())` so the data
   is serialised into the static build and hydrated on the client. Sorts
   `experience` via `app/utils/sortRoles.ts` before exposing it.
-- `useLiveSignal()` — wraps `queryCollection('liveSignal').first()`.
+- `useLiveSignal()` â€” wraps `queryCollection('liveSignal').first()`.
   Pure data composable; no fetch at runtime.
-- `useMaltaClock()` — returns `Ref<string>` of formatted current
+- `useMaltaClock()` â€” returns `Ref<string>` of formatted current
   `Europe/Malta` time. SSR returns the value once; CSR registers a
   `setInterval(1000)` and disposes via `onScopeDispose`.
 - No client-only state. No `useState`. No `localStorage`. No `window`
@@ -526,14 +526,14 @@ app.vue
 
 - `npm run generate` is **unchanged** in shape from the current
   [package.json](../../package.json) script (`nuxt generate` followed
-  by the `index.html` → `404.html` copy), but is now preceded by the
+  by the `index.html` â†’ `404.html` copy), but is now preceded by the
   new `pregenerate` hook which runs
   `node scripts/fetch-live-signal.mjs`. The matching `prebuild` hook
   covers `npm run build`. Both hooks are safe in CI: the script never
   fails the build (it writes a fallback object and exits `0` on any
   failure mode).
 - `nuxt prepare` (run automatically by `postinstall`) is satisfied by
-  the committed placeholder `content/live-signal.json` — it parses as
+  the committed placeholder `content/live-signal.json` â€” it parses as
   the `unavailable` branch of the discriminated union, so type
   generation succeeds on a fresh clone before any build hook has run.
 - Local clones run `node scripts/setup-dev.mjs` once after
@@ -543,7 +543,7 @@ app.vue
   get committed back. CI checkouts are ephemeral so this is a no-op
   there.
 - `scripts/fetch-live-signal.mjs` honours `process.env.GITHUB_TOKEN`
-  if set (sends `Authorization: Bearer …`) to lift the 60/h
+  if set (sends `Authorization: Bearer â€¦`) to lift the 60/h
   unauthenticated GitHub API rate limit. CI may set this as a secret;
   local builds typically run unauthenticated and rely on the fallback
   if rate-limited.
@@ -560,9 +560,9 @@ app.vue
 - The `playwright-lighthouse`-based AC-12 check runs against the same
   preview server inside the existing Playwright project. Single
   runner, single report, mobile + Slow 4G preset. Budget: **1800 ms**
-  TTI to leave CI headroom under AC-12's hard "< 2 s" contract — CI
+  TTI to leave CI headroom under AC-12's hard "< 2 s" contract â€” CI
   variance is significant; budgeting 1800 ms vs the 2000 ms journey
-  threshold gives ~10 % headroom.
+  threshold gives ~10â€¯% headroom.
 
 ### Fonts
 
@@ -571,7 +571,7 @@ app.vue
 family into `tailwind.config.js > theme.fontFamily.sans` (e.g. `Inter`)
 as the proof-of-wiring. **Justification:** `@nuxt/fonts` auto-self-hosts
 Google fonts at build, applies `font-display: swap`, and preloads the
-active weights — all required to hit AC-12 without external font
+active weights â€” all required to hit AC-12 without external font
 requests.
 
 ## Edge cases
@@ -580,7 +580,7 @@ requests.
   `useAsyncData` during `nuxt generate`, so the static HTML contains
   the full DOM, including the live-signal chip with its SSR fallback
   Malta time string. No section may use `<ClientOnly>` for visibility;
-  `<ClientOnly fallback="…">` is permitted only inside `LiveSignal.vue`
+  `<ClientOnly fallback="â€¦">` is permitted only inside `LiveSignal.vue`
   for the Malta clock progressive enhancement, and the fallback string
   satisfies AC-9.
 - **Reduced motion** (AC-20). All Tailwind transition/animation classes
@@ -607,7 +607,7 @@ requests.
 - **Year-only `start` values.** Naive lexicographic compare is wrong
   because `'2025'` < `'2025-06'`. `sortRoles.ts` normalises year-only
   values to `${year}-01` so a role starting `'2025'` sorts as January
-  2025 — earlier than a role starting `'2025-06'`. Covered by
+  2025 â€” earlier than a role starting `'2025-06'`. Covered by
   `tests/unit/utils/sortRoles.spec.ts`.
 - **GitHub API failure modes** (AC-7, AC-11). The fetch script handles
   five cases: HTTP 200 with valid PushEvent (success), HTTP 200 with
@@ -616,7 +616,7 @@ requests.
   rate-limited), and rejected fetch promise / non-200 (fallback).
   Every fallback writes `{ unavailable: true, fetchedAt: <ISO> }` and
   exits `0`. The chip never renders a stale or hard-coded date.
-- **Live-signal staleness.** The chip is bounded by deploy cadence —
+- **Live-signal staleness.** The chip is bounded by deploy cadence â€”
   if James does not redeploy, the commit timestamp ages. Acceptable
   for iteration 1; the relative-time helper makes "3 weeks ago"
   legible. A future iteration may add a scheduled GitHub Action to
@@ -627,14 +627,14 @@ requests.
   via `scripts/setup-dev.mjs` so post-build writes don't appear in
   `git status`. Verified by an integration test that runs
   `nuxt generate` in a clean working tree.
-- **Cache-busting.** Removed in this iteration — there are no CV
+- **Cache-busting.** Removed in this iteration â€” there are no CV
   download URLs to invalidate. The `updated` field in `content/cv.md`
   is retained for future use and for editorial bookkeeping.
 - **Asset paths starting with `_`.** Reaffirmed: `app.buildAssetsDir =
   'assets'` is unchanged. `.nojekyll` is added as belt-and-braces.
 - **Content schema drift.** If `content/cv.md` or
   `content/live-signal.json` violates the schema, `@nuxt/content`
-  build fails fast — surfaced by
+  build fails fast â€” surfaced by
   `tests/integration/content/cv-schema.spec.ts` and
   `tests/integration/live-signal.spec.ts`.
 
@@ -645,45 +645,45 @@ One row per acceptance criterion (multiple rows allowed). Layers per
 
 | Layer | Test | Covers AC |
 |---|---|---|
-| component | `tests/unit/components/Section/Hero.spec.ts` — name/title/employer/tagline render; `H1` is the name; no `<img>`. | AC-1, AC-18, AC-19, AC-25 |
-| e2e (mobile 360×600) | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — hero name/title/employer/tagline visible without scrolling. | AC-1, AC-15 |
-| e2e (desktop 1280×800) | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — same assertion. | AC-1, AC-15 |
-| component | `tests/unit/components/Ui/IconLink.spec.ts` — `aria-label`, `sr-only` text, icon `aria-hidden="true"`/`focusable="false"`; `external` adds `target="_blank" rel="noopener noreferrer"`. | AC-2, AC-4 |
-| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — header email icon visible from any scroll position; `getByRole('link', { name: /email james/i })` reachable in ≤ 10 s; `href` starts with `mailto:`. | AC-2 |
-| integration | `tests/integration/pages/landmarks.spec.ts` — header DOM order is brand → LiveSignal → GitHub IconLink → email IconLink. | AC-3 |
-| integration | `tests/integration/pages/landmarks.spec.ts` — the rendered header element has `getComputedStyle(headerEl).position === 'sticky'` and `top` of `0px`. | AC-3 |
-| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — scroll to the bottom of the page on both mobile and desktop projects; assert the header is still in the viewport (sticky positioning verified end-to-end). | AC-3 |
-| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — header GitHub icon visible from any scroll position; `href === 'https://github.com/jameslanzon'`; HTTP HEAD returns 200. | AC-3, AC-4 |
-| component | `tests/unit/components/Section/Experience.spec.ts` — renders one `Role` per item; asserts the **rendered DOM order** of role titles matches the reverse-chronological order of the fixture (does NOT assert that `sortRoles` was called); no collapsed `<details>`. | AC-5 |
-| unit | `tests/unit/utils/sortRoles.spec.ts` — normalises year-only `start`; sorts reverse-chronologically; ties broken by `current` first. | AC-5 |
-| integration | `tests/integration/pages/content.spec.ts` — generated HTML for `/` contains every role title from the fixture in correct order. | AC-5, AC-14, AC-19 |
-| component | `tests/unit/components/Section/Contact.spec.ts` — email CTA renders; literal text "CV available on request" appears as plain text (not inside `<a>`); LinkedIn link present; **no** download anchors; **no** `?v=` query string anywhere. | AC-6, AC-17, AC-19 |
-| unit | `tests/unit/scripts/fetch-live-signal.spec.ts` — mocks `globalThis.fetch`. Asserts (a) success path writes the success-shape JSON, (b) HTTP 403 + `X-RateLimit-Remaining: 0` writes the fallback, (c) network error writes the fallback, (d) malformed JSON writes the fallback, (e) no PushEvent in the page writes the fallback, (f) when `SKIP_LIVE_SIGNAL_FETCH=1` is set the script exits `0` immediately and does **not** read or write `content/live-signal.json`. Asserts the script always exits `0`. | AC-7, AC-11 |
-| integration | `tests/integration/live-signal.spec.ts` — uses `@nuxt/test-utils` `setup()` (which does **not** invoke npm lifecycle hooks). Writes a fixture `content/live-signal.json` before mount and runs the build with `SKIP_LIVE_SIGNAL_FETCH=1` so the prebuild hook is a no-op. Runs both branches (commit data + unavailable). Asserts the chip text appears in the static `index.html` for each branch. | AC-7, AC-8, AC-11, AC-14 |
-| component | `tests/unit/components/Ui/LiveSignal.spec.ts` — renders both schema branches; asserts `role="status"` + `aria-live="polite"`; with `unavailable: true` asserts no commit date or repo name appears; SSR-only render path produces the static Malta fallback string. | AC-8, AC-10, AC-11 |
-| unit | `tests/unit/composables/useMaltaClock.spec.ts` — Vitest fake timers; the ref updates each second; the interval is cleared on scope dispose. | AC-9 |
-| unit | `tests/unit/composables/useLiveSignal.spec.ts` — discriminated union narrows correctly for both branches. | AC-8, AC-11 |
-| e2e (Lighthouse) | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — `playwright-lighthouse` mobile + Slow 4G; assert TTI < 1800 ms. | AC-12 |
-| e2e (axe) | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — `@axe-core/playwright` scan tagged `wcag22aa`; zero `serious`/`critical`; explicitly include `bypass`, `landmark-one-main`, `region`, `heading-order`, `aria-allowed-role`. | AC-13, AC-21, AC-25 |
-| e2e | `tests/e2e/no-js.spec.ts` — `javaScriptEnabled: false`; assert all five sections present; live-signal chip and Malta fallback present; the Malta fallback text matches the regex `/Malta · CES?T/` (survives DST flips); `mailto:` links usable. | AC-14, AC-9 |
-| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — on both mobile and desktop projects, assert the same accessible-name set is reachable: hero `<h1>` containing "James Lanzon"; section headings `<h2>` named "Experience", "Skills", "Contact"; header links named "Email James" and "James' GitHub profile" (`getByRole('link', { name: ... })`); a `role="status"` element (live-signal). Uses `getByRole`/`getByLabel`. | AC-15 |
-| integration | `tests/integration/pages/content.spec.ts` — generated HTML must not contain `jameslanzon@gmail.com`; the live-signal `role="status"` element is present. | AC-16 |
-| component | `tests/unit/components/Section/Contact.spec.ts` — LinkedIn link present in DOM; GitHub **not** rendered in contact section (it lives in the header). | AC-17 |
-| component | `tests/unit/components/Section/Hero.spec.ts` — no `<img>` / `<NuxtImg>`. | AC-18 |
-| unit | `tests/unit/composables/useCvContent.spec.ts` — typed refs derived from fixture; `experience` already sorted. | AC-19 |
-| integration | `tests/integration/content/cv-schema.spec.ts` — `content/cv.md` parses against the Zod schema (and rejects a fixture containing a `cv:` block). | AC-19 |
-| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — Chromium context with `reducedMotion: 'reduce'`; assert computed `transition-duration` and `animation-duration` are both `0s` on `[data-testid="hero-cta"]` (which uses `motion-safe:transition`); assert the Malta clock still ticks. | AC-20 |
-| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` — Tab once → SkipLink visible; Enter → `document.activeElement.id === 'main'` (the `<main>` element has `tabindex="-1"` so focus moves there programmatically). | AC-21 |
-| component | `tests/unit/components/Ui/SkipLink.spec.ts` — first focusable; visible only on focus. | AC-21 |
-| integration | `tests/integration/pages/head.spec.ts` — generated HTML contains `og:title`, `og:description`, `og:image`, `og:url`, `twitter:card="summary_large_image"`, `twitter:image`; the `og:image` value is the absolute URL `https://jameslanzon.com/og/og-image.png`. | AC-22 |
-| integration | `tests/integration/pages/head.spec.ts` — generated HTML contains expected favicon `<link>` tags and `<link rel="manifest">`. | AC-23 |
-| integration | `tests/integration/pages/head.spec.ts` — `<html lang="en">` present in generated HTML. | AC-24 |
-| component | `tests/unit/components/Section/Skills.spec.ts` — `H2` for section, one `H3` per skill group. | AC-25 |
-| integration | `tests/integration/pages/landmarks.spec.ts` — heading sequence is exactly `H1 → H2 → H3 …` with no level skipped. | AC-25 |
-| integration | `tests/integration/pages/cname.spec.ts` — after `nuxt generate`, `.output/public/CNAME` exists with the contents `jameslanzon.com`. | AC-26 |
+| component | `tests/unit/components/Section/Hero.spec.ts` â€” name/title/employer/tagline render; `H1` is the name; no `<img>`. | AC-1, AC-18, AC-19, AC-25 |
+| e2e (mobile 360Ã—600) | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” hero name/title/employer/tagline visible without scrolling. | AC-1, AC-15 |
+| e2e (desktop 1280Ã—800) | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” same assertion. | AC-1, AC-15 |
+| component | `tests/unit/components/Ui/IconLink.spec.ts` â€” `aria-label`, `sr-only` text, icon `aria-hidden="true"`/`focusable="false"`; `external` adds `target="_blank" rel="noopener noreferrer"`. | AC-2, AC-4 |
+| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” header email icon visible from any scroll position; `getByRole('link', { name: /email james/i })` reachable in â‰¤ 10 s; `href` starts with `mailto:`. | AC-2 |
+| integration | `tests/integration/pages/landmarks.spec.ts` â€” header DOM order is brand â†’ LiveSignal â†’ GitHub IconLink â†’ email IconLink. | AC-3 |
+| integration | `tests/integration/pages/landmarks.spec.ts` â€” the rendered header element has `getComputedStyle(headerEl).position === 'sticky'` and `top` of `0px`. | AC-3 |
+| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” scroll to the bottom of the page on both mobile and desktop projects; assert the header is still in the viewport (sticky positioning verified end-to-end). | AC-3 |
+| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” header GitHub icon visible from any scroll position; `href === 'https://github.com/jameslanzon'`; HTTP HEAD returns 200. | AC-3, AC-4 |
+| component | `tests/unit/components/Section/Experience.spec.ts` â€” renders one `Role` per item; asserts the **rendered DOM order** of role titles matches the reverse-chronological order of the fixture (does NOT assert that `sortRoles` was called); no collapsed `<details>`. | AC-5 |
+| unit | `tests/unit/utils/sortRoles.spec.ts` â€” normalises year-only `start`; sorts reverse-chronologically; ties broken by `current` first. | AC-5 |
+| integration | `tests/integration/pages/content.spec.ts` â€” generated HTML for `/` contains every role title from the fixture in correct order. | AC-5, AC-14, AC-19 |
+| component | `tests/unit/components/Section/Contact.spec.ts` â€” email CTA renders; literal text "CV available on request" appears as plain text (not inside `<a>`); LinkedIn link present; **no** download anchors; **no** `?v=` query string anywhere. | AC-6, AC-17, AC-19 |
+| unit | `tests/unit/scripts/fetch-live-signal.spec.ts` â€” mocks `globalThis.fetch`. Asserts (a) success path writes the success-shape JSON, (b) HTTP 403 + `X-RateLimit-Remaining: 0` writes the fallback, (c) network error writes the fallback, (d) malformed JSON writes the fallback, (e) no PushEvent in the page writes the fallback, (f) when `SKIP_LIVE_SIGNAL_FETCH=1` is set the script exits `0` immediately and does **not** read or write `content/live-signal.json`. Asserts the script always exits `0`. | AC-7, AC-11 |
+| integration | `tests/integration/live-signal.spec.ts` â€” uses `@nuxt/test-utils` `setup()` (which does **not** invoke npm lifecycle hooks). Writes a fixture `content/live-signal.json` before mount and runs the build with `SKIP_LIVE_SIGNAL_FETCH=1` so the prebuild hook is a no-op. Runs both branches (commit data + unavailable). Asserts the chip text appears in the static `index.html` for each branch. | AC-7, AC-8, AC-11, AC-14 |
+| component | `tests/unit/components/Ui/LiveSignal.spec.ts` â€” renders both schema branches; asserts `role="status"` + `aria-live="polite"`; with `unavailable: true` asserts no commit date or repo name appears; SSR-only render path produces the static Malta fallback string. | AC-8, AC-10, AC-11 |
+| unit | `tests/unit/composables/useMaltaClock.spec.ts` â€” Vitest fake timers; the ref updates each second; the interval is cleared on scope dispose. | AC-9 |
+| unit | `tests/unit/composables/useLiveSignal.spec.ts` â€” discriminated union narrows correctly for both branches. | AC-8, AC-11 |
+| e2e (Lighthouse) | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” `playwright-lighthouse` mobile + Slow 4G; assert TTI < 1800 ms. | AC-12 |
+| e2e (axe) | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” `@axe-core/playwright` scan tagged `wcag22aa`; zero `serious`/`critical`; explicitly include `bypass`, `landmark-one-main`, `region`, `heading-order`, `aria-allowed-role`. | AC-13, AC-21, AC-25 |
+| e2e | `tests/e2e/no-js.spec.ts` â€” `javaScriptEnabled: false`; assert all five sections present; live-signal chip and Malta fallback present; the Malta fallback text matches the regex `/Malta Â· CES?T/` (survives DST flips); `mailto:` links usable. | AC-14, AC-9 |
+| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” on both mobile and desktop projects, assert the same accessible-name set is reachable: hero `<h1>` containing "James Lanzon"; section headings `<h2>` named "Experience", "Skills", "Contact"; header links named "Email James" and "James' GitHub profile" (`getByRole('link', { name: ... })`); a `role="status"` element (live-signal). Uses `getByRole`/`getByLabel`. | AC-15 |
+| integration | `tests/integration/pages/content.spec.ts` â€” generated HTML must not contain `jameslanzon@gmail.com`; the live-signal `role="status"` element is present. | AC-16 |
+| component | `tests/unit/components/Section/Contact.spec.ts` â€” LinkedIn link present in DOM; GitHub **not** rendered in contact section (it lives in the header). | AC-17 |
+| component | `tests/unit/components/Section/Hero.spec.ts` â€” no `<img>` / `<NuxtImg>`. | AC-18 |
+| unit | `tests/unit/composables/useCvContent.spec.ts` â€” typed refs derived from fixture; `experience` already sorted. | AC-19 |
+| integration | `tests/integration/content/cv-schema.spec.ts` â€” `content/cv.md` parses against the Zod schema (and rejects a fixture containing a `cv:` block). | AC-19 |
+| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” Chromium context with `reducedMotion: 'reduce'`; assert computed `transition-duration` and `animation-duration` are both `0s` on `[data-testid="hero-cta"]` (which uses `motion-safe:transition`); assert the Malta clock still ticks. | AC-20 |
+| e2e | `tests/e2e/JNY-001-recruiter-scan.spec.ts` â€” Tab once â†’ SkipLink visible; Enter â†’ `document.activeElement.id === 'main'` (the `<main>` element has `tabindex="-1"` so focus moves there programmatically). | AC-21 |
+| component | `tests/unit/components/Ui/SkipLink.spec.ts` â€” first focusable; visible only on focus. | AC-21 |
+| integration | `tests/integration/pages/head.spec.ts` â€” generated HTML contains `og:title`, `og:description`, `og:image`, `og:url`, `twitter:card="summary_large_image"`, `twitter:image`; the `og:image` value is the absolute URL `https://jameslanzon.com/og/og-image.png`. | AC-22 |
+| integration | `tests/integration/pages/head.spec.ts` â€” generated HTML contains expected favicon `<link>` tags and `<link rel="manifest">`. | AC-23 |
+| integration | `tests/integration/pages/head.spec.ts` â€” `<html lang="en">` present in generated HTML. | AC-24 |
+| component | `tests/unit/components/Section/Skills.spec.ts` â€” `H2` for section, one `H3` per skill group. | AC-25 |
+| integration | `tests/integration/pages/landmarks.spec.ts` â€” heading sequence is exactly `H1 â†’ H2 â†’ H3 â€¦` with no level skipped. | AC-25 |
+| integration | `tests/integration/pages/cname.spec.ts` â€” after `nuxt generate`, `.output/public/CNAME` exists with the contents `jameslanzon.com`. | AC-26 |
 
 > **Why `playwright-lighthouse` for AC-12.** It runs inside the existing
-> e2e suite — single runner, single report, single browser context.
+> e2e suite â€” single runner, single report, single browser context.
 > It supports the `mobile` + `Slow 4G` preset out of the box and
 > exposes TTI as a numeric assertion. `lighthouse-ci` would add a
 > second tool and a separate report; a hand-rolled `npx lighthouse`
@@ -693,11 +693,11 @@ One row per acceptance criterion (multiple rows allowed). Layers per
 
 > **Ordering.** T1 must produce
 > [docs/decisions/ADR-001-live-signal-build-time.md](../decisions/ADR-001-live-signal-build-time.md)
-> **before T2 begins**. T1 blocks T2…T24. The implementer creates the
+> **before T2 begins**. T1 blocks T2â€¦T24. The implementer creates the
 > ADR using [docs/decisions/_TEMPLATE.md](../decisions/_TEMPLATE.md)
 > with the contents specified in T1 below.
 
-- [x] **T1** — Author
+- [x] **T1** â€” Author
       [docs/decisions/ADR-001-live-signal-build-time.md](../decisions/ADR-001-live-signal-build-time.md)
       from `docs/decisions/_TEMPLATE.md`. Required sections:
       **Context** (static site, no runtime API calls, no JS-disabled
@@ -705,9 +705,9 @@ One row per acceptance criterion (multiple rows allowed). Layers per
       fallback); **Consequences** (rate-limit risk in CI, data
       freshness bounded by deploy cadence, requires a
       placeholder-committed JSON for type safety); **Alternatives
-      considered** (client-side fetch — rejected: breaks no-JS;
-      GitHub Action that opens a PR — rejected: too much ceremony for
-      this iteration); **Security** (XSS surface — Vue text
+      considered** (client-side fetch â€” rejected: breaks no-JS;
+      GitHub Action that opens a PR â€” rejected: too much ceremony for
+      this iteration); **Security** (XSS surface â€” Vue text
       interpolation auto-escapes, `v-html` is never used; commit
       messages are not captured by the script and never rendered;
       `repo` and `sha` are still treated as untrusted strings and
@@ -716,29 +716,29 @@ One row per acceptance criterion (multiple rows allowed). Layers per
       private data is fetched, written to disk, or rendered;
       `GITHUB_TOKEN` is read from `process.env` only and never
       persisted). T1 must land before T2 begins.
-- [x] **T2** — Add `cv` and `liveSignal` collections to
-      `content.config.ts` per §Data shapes. Author
+- [x] **T2** â€” Add `cv` and `liveSignal` collections to
+      `content.config.ts` per Â§Data shapes. Author
       `tests/integration/content/cv-schema.spec.ts`.
-- [x] **T3** — **Cleanup pass.** (a) Delete the repo-root `index.html`.
+- [x] **T3** â€” **Cleanup pass.** (a) Delete the repo-root `index.html`.
       (b) Move `website/` to `docs/legacy/website-2016-2018/` and add a
-      short `README.md` there marking it a frozen historical artefact —
+      short `README.md` there marking it a frozen historical artefact â€”
       do not extend, do not serve. (c) Read
       [.github/workflows/deploy-pages.yml](../../.github/workflows/deploy-pages.yml)
       and confirm it deploys only `.output/public` and never references
       the legacy folder. (d) Move `CNAME` from the repo root to
       `public/CNAME` so `nuxt generate` copies it into
       `.output/public/CNAME`.
-- [x] **T4** — Add Tailwind CSS entry (`app/assets/css/tailwind.css`),
+- [x] **T4** â€” Add Tailwind CSS entry (`app/assets/css/tailwind.css`),
       register it in `nuxt.config.ts`, update `tailwind.config.js`
       content globs, wire `theme.fontFamily.sans` to the
       `@nuxt/fonts`-managed family.
-- [x] **T5** — Implement `app/utils/sortRoles.ts` + unit test.
-- [x] **T6** — Implement `app/utils/relativeTime.ts` + unit test.
-- [x] **T7** — Implement `scripts/fetch-live-signal.mjs` per the
-      §Affected areas description, including the
+- [x] **T5** â€” Implement `app/utils/sortRoles.ts` + unit test.
+- [x] **T6** â€” Implement `app/utils/relativeTime.ts` + unit test.
+- [x] **T7** â€” Implement `scripts/fetch-live-signal.mjs` per the
+      Â§Affected areas description, including the
       `SKIP_LIVE_SIGNAL_FETCH=1` early-exit branch and the
       `GITHUB_TOKEN` Authorization header. Add the placeholder
-      `content/live-signal.json` (committed and **tracked** — do
+      `content/live-signal.json` (committed and **tracked** â€” do
       **not** add it to `.gitignore`). Add `scripts/setup-dev.mjs`
       (one-shot helper that runs
       `git update-index --skip-worktree content/live-signal.json`).
@@ -746,49 +746,49 @@ One row per acceptance criterion (multiple rows allowed). Layers per
       Author `tests/unit/scripts/fetch-live-signal.spec.ts` covering
       all six branches (success, 403 + rate limit, network error,
       malformed JSON, no PushEvent, `SKIP_LIVE_SIGNAL_FETCH=1`).
-- [x] **T8** — Implement `app/composables/useLiveSignal.ts` +
+- [x] **T8** â€” Implement `app/composables/useLiveSignal.ts` +
       `app/composables/useMaltaClock.ts` + unit tests (Vitest fake
       timers for the clock).
-- [x] **T9** — Implement `app/composables/useCvContent.ts` + unit test
+- [x] **T9** â€” Implement `app/composables/useCvContent.ts` + unit test
       (uses `sortRoles`).
-- [ ] **T10** — Implement `app/components/Ui/IconLink.vue`,
+- [x] **T10** â€” Implement `app/components/Ui/IconLink.vue`,
       `app/components/Ui/LiveSignal.vue`, and
       `app/components/Ui/SkipLink.vue` + specs.
-- [ ] **T11** — Implement `app/components/Timeline/Role.vue` + spec.
-- [ ] **T12** — Implement Section components (Hero, Overview,
+- [x] **T11** â€” Implement `app/components/Timeline/Role.vue` + spec.
+- [x] **T12** â€” Implement Section components (Hero, Overview,
       Experience, Skills, Contact) + specs. Contact must render the
-      "CV available on request" line as plain text — no link, no
-      `mailto:` for the CV — and a single LinkedIn secondary link.
-- [ ] **T13** — Implement `app/layouts/default.vue`: skip link as the
+      "CV available on request" line as plain text â€” no link, no
+      `mailto:` for the CV â€” and a single LinkedIn secondary link.
+- [x] **T13** â€” Implement `app/layouts/default.vue`: skip link as the
       first focusable element; sticky header
       (`class="sticky top-0 z-40 ..."` with an opaque/blur background
-      and a bottom border) containing brand on the left and (left →
+      and a bottom border) containing brand on the left and (left â†’
       right) `LiveSignal` + GitHub `IconLink` + email `IconLink` on
       the right; `<main id="main" tabindex="-1">` slot; footer with
       LinkedIn secondary link + copyright.
-- [ ] **T14** — Replace `app/app.vue` with layout + page wrapper;
+- [x] **T14** â€” Replace `app/app.vue` with layout + page wrapper;
       create `app/pages/index.vue` querying `useCvContent()`; add
       `useSeoMeta` for `og:*` and `twitter:*`; verify
       `app.htmlAttrs.lang = 'en'` in `nuxt.config.ts`; add
       `app.head.link` entries for the favicon set.
-- [ ] **T15** — Verify (or update if drifted)
+- [x] **T15** â€” Verify (or update if drifted)
       [docs/cv/cv.md](../../docs/cv/cv.md) uses
       `lanzonprojects@gmail.com`. Populate `content/cv.md` from it
       (frontmatter only). Note: `docs/cv/cv.md` remains the editorial
       source; no test or task is attached to it.
-- [ ] **T16** — Add `public/og/og-image.png` (1200 × 630). If
+- [x] **T16** â€” Add `public/og/og-image.png` (1200 Ã— 630). If
       owner-supplied artwork is unavailable, generate a temporary
       SVG-rendered-to-PNG carrying the tagline.
-- [ ] **T17** — Add the favicon set to `public/` and reference each
+- [x] **T17** â€” Add the favicon set to `public/` and reference each
       entry from `nuxt.config.ts > app.head.link`. Add
       `public/.nojekyll`.
-- [ ] **T18** — Install `@axe-core/playwright` and
+- [x] **T18** â€” Install `@axe-core/playwright` and
       `playwright-lighthouse`. Configure `playwright.config.ts` with
-      `mobile` (360 × 600) and `desktop` (1280 × 800) projects, and
+      `mobile` (360 Ã— 600) and `desktop` (1280 Ã— 800) projects, and
       set `webServer.command = 'npm run generate && npm run preview'`
       so a fresh-clone `npm run test:e2e` produces `.output/public`
       and serves it from a single source of truth.
-- [ ] **T19** — Author `tests/integration/live-signal.spec.ts` (uses
+- [x] **T19** â€” Author `tests/integration/live-signal.spec.ts` (uses
       `@nuxt/test-utils` `setup()` with a pre-seeded fixture and
       `SKIP_LIVE_SIGNAL_FETCH=1` to prevent the prebuild hook from
       overwriting the seeded JSON) and the four focused page specs:
@@ -800,27 +800,27 @@ One row per acceptance criterion (multiple rows allowed). Layers per
       `tests/integration/pages/content.spec.ts` (role titles in
       order, no legacy email, `role="status"` chip present), and
       `tests/integration/pages/cname.spec.ts`.
-- [ ] **T20** — Author `tests/e2e/JNY-001-recruiter-scan.spec.ts`
+- [x] **T20** â€” Author `tests/e2e/JNY-001-recruiter-scan.spec.ts`
       covering hero, contact, header right-cluster, axe (incl.
       `bypass`, `landmark-one-main`, `region`, `heading-order`),
       skip-link keyboard test, reduced-motion emulation, Lighthouse
       TTI < 1800 ms.
-- [ ] **T21** — Author `tests/e2e/no-js.spec.ts`
+- [x] **T21** â€” Author `tests/e2e/no-js.spec.ts`
       (`javaScriptEnabled: false`, including the live-signal SSR
       fallback).
-- [ ] **T22** — Update [README.md](../../README.md) to document: the
+- [x] **T22** â€” Update [README.md](../../README.md) to document: the
       live-signal pregenerate hook; the optional `GITHUB_TOKEN` env
       var; the `SKIP_LIVE_SIGNAL_FETCH=1` test/CI escape hatch; the
       one-shot `node scripts/setup-dev.mjs` step that fresh clones
       run after `npm install` to apply skip-worktree on
       `content/live-signal.json`; and the editorial-source role of
       `docs/cv/cv.md`.
-- [ ] **T23** — Run full pipeline: `npm run lint`,
+- [x] **T23** â€” Run full pipeline: `npm run lint`,
       `npm run typecheck`, `npm test`, `npm run generate`; manually
       open `.output/public/index.html` with JS disabled; confirm
       `.output/public/CNAME` and `.output/public/.nojekyll` exist;
       confirm the live-signal chip renders.
-- [ ] **T24** — Write `docs/logs/YYYY-MM-DD-spec-001-portfolio-revamp.md`
+- [x] **T24** â€” Write `docs/logs/YYYY-MM-DD-spec-001-portfolio-revamp.md`
       and update SPEC-001 status to `done`.
 
 ## Risks & rollback
@@ -888,12 +888,12 @@ _None._
 
 Captured here so they aren't lost. **Not** in scope for SPEC-001.
 
-- **Live-signal upgrade — server-side regeneration on a schedule**
+- **Live-signal upgrade â€” server-side regeneration on a schedule**
   (e.g. GitHub Action `cron` every few hours) so the chip refreshes
   between James' own deploys. The action would run
   `scripts/fetch-live-signal.mjs` and open a PR / push to a deploy
   branch.
-- **Downloadable CV** (PDF + Markdown) if/when there is demand —
+- **Downloadable CV** (PDF + Markdown) if/when there is demand â€”
   deliberately removed in iteration 1.
 - **Command palette** / explicit motion toggle UI (deferred from M5).
 - **Contact form** as a fallback for visitors without a mail client.
