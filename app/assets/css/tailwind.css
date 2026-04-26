@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply font-sans text-ink-black bg-paper-white antialiased;
+    line-height: 1.6;
+  }
+
+  /* prose-friendly defaults for the experience timeline / overview */
+  .prose,
+  .prose-portfolio {
+    max-width: 70ch;
+    line-height: 1.65;
+  }
+
+  .prose-portfolio :where(h2) {
+    @apply mt-12 mb-4 text-2xl font-semibold tracking-tight;
+  }
+
+  .prose-portfolio :where(h3) {
+    @apply mt-6 mb-2 text-lg font-semibold;
+  }
+
+  .prose-portfolio :where(p) {
+    @apply my-3;
+  }
+
+  .prose-portfolio :where(ul) {
+    @apply my-3 pl-5 list-disc;
+  }
+}

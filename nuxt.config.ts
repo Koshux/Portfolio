@@ -25,6 +25,9 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module'
   ],
 
+  // Tailwind entry — registered globally so all pages get base/components/utilities.
+  css: ['~/assets/css/tailwind.css'],
+
   // Essential for GH Pages: ensure assets don't start with underscores
   app: {
     baseURL: '/',
