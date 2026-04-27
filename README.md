@@ -214,3 +214,36 @@ The Playwright e2e suite uses a fixture ID (`G-TEST00000`) injected by
 **hard-coded** in the config, never inherited from your shell or
 `.env`, so the real ID can never leak into e2e screenshots, traces,
 or the leak-guard test.
+
+### Custom domain & HTTPS (SPEC-003)
+
+The apex `https://jameslanzon.com` and `https://www.jameslanzon.com`
+are served over a Let's Encrypt certificate provisioned automatically
+by GitHub Pages. There is **no CDN** in front, **no GoDaddy SSL
+product**, and **no key material in this repo or in CI**. The runbook
+that puts everything in place lives at
+[docs/runbooks/https-godaddy-github-pages.md](./docs/runbooks/https-godaddy-github-pages.md);
+the architectural rationale is captured in
+[ADR-002](./docs/decisions/ADR-002-https-on-github-pages.md).
+
+| What | Where |
+|---|---|
+| Manual one-time setup | [docs/runbooks/https-godaddy-github-pages.md](./docs/runbooks/https-godaddy-github-pages.md) |
+| Architectural decision | [ADR-002](./docs/decisions/ADR-002-https-on-github-pages.md) |
+| Mixed-content + cert-material guards | [tests/integration/cname.spec.ts](./tests/integration/cname.spec.ts), [tests/integration/no-cert-files.spec.ts](./tests/integration/no-cert-files.spec.ts) |
+| Production HTTPS smoke | [tests/e2e/https-health.spec.ts](./tests/e2e/https-health.spec.ts) |
+| Nightly health workflow | [.github/workflows/nightly-https-health.yml](./.github/workflows/nightly-https-health.yml) |
+
+The production smoke is excluded from the default `npm run test:e2e`
+run (it would fail on every PR until HTTPS is live and would block
+unrelated work). Run it explicitly:
+
+```powershell
+$env:PLAYWRIGHT_PROJECT = 'production-smoke'
+npm run test:e2e:prod
+```
+
+Or trigger the `nightly-https-health` workflow via
+**Actions → nightly-https-health → Run workflow**. On failure the
+workflow opens (or comments on) a single GitHub issue labelled
+`https-health` — one issue per outage, not one per cron tick.
