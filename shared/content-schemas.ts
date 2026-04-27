@@ -66,3 +66,20 @@ export const liveSignalSchema = z.union([
     fetchedAt: z.string().datetime(),
   }),
 ])
+
+// SPEC-002 — consent prompt + privacy notice copy lives in
+// content/legal/*.md. The consent doc requires the prompt copy fields;
+// the privacy doc only needs `title`. Optional fields keep both
+// document shapes valid under a single schema.
+//
+// NOTE: the prompt body field is named `prompt` (not `body`) because
+// @nuxt/content v3 surfaces the parsed-markdown AST under `body` for
+// any `type: 'page'` collection, which would shadow a frontmatter
+// `body` field and cause it to render as `[object Object]`.
+export const consentFrontmatterSchema = z.object({
+  title: z.string().max(120),
+  prompt: z.string().max(280).optional(),
+  acceptLabel: z.string().max(20).optional(),
+  declineLabel: z.string().max(20).optional(),
+  privacyHref: z.string().default('/legal/privacy'),
+})

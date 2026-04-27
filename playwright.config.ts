@@ -41,7 +41,15 @@ export default defineConfig({
   webServer: {
     // Test the *generated* static output. Single source of truth: a fresh
     // clone running `npm run test:e2e` produces .output/public and serves it.
+    //
+    // SPEC-002 — set a fixture GA4 measurement ID for the e2e build so
+    // the active-path tests (consent banner, GA tag injection on
+    // accept) have something to inject. The integration suite covers
+    // the inert build (env var unset).
     command: 'npm run generate && npm run preview',
+    env: {
+      NUXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID ?? 'G-TEST00000',
+    },
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

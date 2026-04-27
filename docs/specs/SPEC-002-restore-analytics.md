@@ -29,9 +29,11 @@ analytics module is fully inert: no consent prompt, no tag, no
 imports — the global "kill switch" required by JNY-002. Consent is
 persisted in `localStorage` under a versioned key so a future ADR can
 invalidate stale consent without nagging returning visitors. The
-prompt is reachable forever via a "Cookie preferences" link in the
-footer and respects `Sec-GPC: 1` and `navigator.doNotTrack === '1'`
-as auto-decline signals. See [JNY-002](../journeys/JNY-002-restore-analytics.md).
+prompt is reachable forever via a "Cookie preferences" button on
+`/legal/privacy` and respects `Sec-GPC: 1` and `navigator.doNotTrack === '1'`
+as auto-decline signals. The persistent withdrawal path is the
+Privacy link in the header contact menu → the page → the trigger.
+See [JNY-002](../journeys/JNY-002-restore-analytics.md).
 
 ## Acceptance criteria
 
@@ -59,13 +61,14 @@ The contract. Each is verifiable by a test or a scripted manual check.
       buttons are `<button type="button">`. Verified by a unit test
       asserting both buttons share the same Tailwind class set for
       sizing/padding and by an axe scan with zero violations.
-- [ ] **AC-5** — The prompt is keyboard-reachable. Tabbing from the
-      skip link reaches the prompt's "Decline" then "Accept" then
-      "Cookie preferences" link in DOM order. `Esc` is a no-op (the
-      prompt is non-modal and dismissal happens via Decline only — no
-      "X" close button, since "X" is a known dark pattern that
-      ambiguously implies decline-without-recording). Focus is **not**
-      trapped.
+- [ ] **AC-5** — The prompt is keyboard-reachable. Tabbing into the
+      prompt reaches "Decline" then "Accept" in DOM order. `Esc` is a
+      no-op (the prompt is non-modal and dismissal happens via
+      Decline only — no "X" close button, since "X" is a known dark
+      pattern that ambiguously implies decline-without-recording).
+      Focus is **not** trapped. (Revised — the Cookie preferences
+      trigger is no longer in the layout, so it is not part of the
+      prompt's local focus chain.)
 - [ ] **AC-6** — The prompt passes axe-core WCAG 2.2 AA scans with
       **zero** `serious` or `critical` violations. The buttons meet
       `≥ 4.5:1` contrast against their background and have a visible
@@ -78,15 +81,15 @@ The contract. Each is verifiable by a test or a scripted manual check.
       `'{"analytics":"denied","ts":<unix-ms>}'`. Verified by a
       Playwright spec that reloads twice and asserts the prompt does
       not reappear and the recorded value is unchanged.
-- [ ] **AC-8** — A persistent footer link with the accessible name
-      "Cookie preferences" reopens the prompt on click and on
-      `Enter`/`Space` key activation. The reopened prompt is
-      pre-selected on the **most recent** decision (visual pre-fill,
-      not pre-checked input — there are no checkboxes). Choosing the
-      opposite decision and confirming flips the stored value and, if
-      flipping `granted → denied`, **also** clears all `_ga*` cookies
-      from `document.cookie` and removes the GA4 script element from
-      the DOM. **Cookie clearance pattern:** the implementation must
+- [ ] **AC-8** — A persistent "Cookie preferences" trigger on
+      `/legal/privacy` reopens the prompt on click and on `Enter`/
+      `Space` key activation. The reopened prompt is pre-selected on
+      the **most recent** decision (visual pre-fill, not pre-checked
+      input — there are no checkboxes). Choosing the opposite
+      decision and confirming flips the stored value and, if flipping
+      `granted → denied`, **also** clears all `_ga*` cookies from
+      `document.cookie` and removes the GA4 script element from the
+      DOM. **Cookie clearance pattern:** the implementation must
       iterate over every cookie name returned by `document.cookie`
       whose name matches `/^(_ga|_gid|_gac|__utm)/` and overwrite
       each with `name=; max-age=0; path=/; domain=<eTLD+1>` **and**
@@ -94,14 +97,17 @@ The contract. Each is verifiable by a test or a scripted manual check.
       are required because GA4 sets the cookie on the eTLD+1
       (`jameslanzon.com`) but a naive single-form clear leaves
       stragglers on the host-only variant. Verified by Playwright.
-- [ ] **AC-9** — When `NUXT_PUBLIC_GA_MEASUREMENT_ID` is unset or
-      empty at build time, the generated static HTML for `/` contains
-      **no** `<script>` tag whose `src` mentions `googletagmanager`,
-      `gtag`, or the literal string `G-`. The "Cookie preferences"
-      footer link is also **absent** in this mode (nothing to consent
-      to). Verified by an integration test that builds twice — once
-      with the env var set to a fixture ID `G-TEST00000`, once unset —
-      and greps the generated HTML.
+- [x] **AC-9** — (Revised — minimum-legal scope.) When a measurement
+      ID is configured, `/legal/privacy` renders a
+      `data-testid='cookie-preferences-link'` `<button>` (NOT an
+      anchor). Clicking it re-opens the consent prompt over whatever
+      route is current. When no measurement ID is configured the
+      trigger MUST NOT render anywhere on the site. Additionally,
+      when `NUXT_PUBLIC_GA_MEASUREMENT_ID` is unset or empty at build
+      time, the generated static HTML for `/` contains **no**
+      `<script>` tag whose `src` mentions `googletagmanager`,
+      `gtag`, or the literal string `G-`. Verified by an integration
+      test that builds twice and greps the generated HTML.
 - [ ] **AC-10** — When consent is `granted`, the GA4 tag
       (`https://www.googletagmanager.com/gtag/js?id=<MEASUREMENT_ID>`)
       is injected into the document via `useHead({ script: [...] })`
@@ -121,9 +127,10 @@ The contract. Each is verifiable by a test or a scripted manual check.
       Control) **or** `navigator.doNotTrack === '1'`, the consent
       prompt **does not render** and consent is treated as `denied`
       (no script load, no requests, no cookies). The "Cookie
-      preferences" footer link is still rendered and clicking it shows
-      the prompt with the explanation "Your browser is asking us not
-      to track you. We are honouring that. You can override here."
+      preferences" trigger on `/legal/privacy` is still rendered when
+      a measurement ID is configured, and clicking it shows the
+      prompt with the explanation "Your browser is asking us not to
+      track you. We are honouring that. You can override here."
       Verified by Playwright with `await context.setExtraHTTPHeaders({ 'Sec-GPC': '1' })`
       and a separate run that overrides `navigator.doNotTrack` via
       `addInitScript`.
@@ -139,8 +146,10 @@ The contract. Each is verifiable by a test or a scripted manual check.
       `gtag('event', 'section_view', …)` call within a session.
 - [ ] **AC-15** — When JavaScript is disabled, the generated
       `index.html` contains **no** consent prompt markup, **no**
-      "Cookie preferences" footer link inside a `<noscript>` block,
-      and **no** GA tag. The page is identical to iteration 1's
+      sitewide `<footer>`, and **no** GA tag. There is no Cookie
+      preferences trigger in the home-route layout (the trigger only
+      renders on `/legal/privacy`, where it is harmlessly inert
+      without JS). The page is identical to iteration 1's
       JS-disabled output other than (a) any new `<noscript>` tags
       explicitly tested for absence and (b) an unchanged DOM. Verified
       by `tests/e2e/no-js.spec.ts` extension.
@@ -158,13 +167,14 @@ The contract. Each is verifiable by a test or a scripted manual check.
       to `/legal/privacy` (new content page), and the two button
       labels. No copy is hard-coded in `app/components/Ui/`.
 - [ ] **AC-18** — A new content page `/legal/privacy` exists, is
-      reachable from the footer, and lists: what data is collected
-      (page path, referrer, device category, country), what is **not**
-      collected (precise IP, advertising IDs, cross-site identifiers),
-      retention (default GA4: 14 months), and how to opt out
-      ("Cookie preferences" link plus browser DNT/Sec-GPC notes).
-      The page is statically generated from `content/legal/privacy.md`
-      and follows the iteration-1 typography conventions.
+      reachable from the header contact menu, and lists: what data
+      is collected (page path, referrer, device category, country),
+      what is **not** collected (precise IP, advertising IDs,
+      cross-site identifiers), retention (default GA4: 14 months),
+      and how to opt out ("Cookie preferences" button on this page
+      plus browser DNT/Sec-GPC notes). The page is statically
+      generated from `content/legal/privacy.md` and follows the
+      iteration-1 typography conventions.
 - [ ] **AC-19** — Lighthouse Performance score on the home route
       (`/`) under `mobile` configuration with throttling preset
       `Slow 4G` is **≥ 90** in **both** consent states (granted and
@@ -219,14 +229,16 @@ The contract. Each is verifiable by a test or a scripted manual check.
       the same 1800 ms strict budget from SPEC-001 applies. Under
       consent `granted`, TTI MUST be ≤ decline-state TTI **+ 100 ms**
       (delta budget per AC-10).
-- [ ] **AC-26** — **`/legal/privacy` is reachable from the footer**
-      via a `<NuxtLink to="/legal/privacy">` with the accessible name
-      "Privacy". This link is rendered **regardless** of whether the
-      measurement ID is configured (the privacy notice is harmless
-      and useful even in the inert build), unlike the
-      `CookiePreferencesLink` which is hidden in inert mode (AC-9).
-      Verified by an integration test asserting the link is present
-      in both build modes.
+- [x] **AC-26** — (Revised — minimum-legal placement.)
+      `/legal/privacy` is reachable on every page via a
+      `<NuxtLink to="/legal/privacy">` with the accessible name
+      `Privacy` rendered inside `app/components/Ui/ContactMenu.vue`
+      (both the mobile `<details>` dropdown and the desktop inline
+      cluster). The link MUST be present whether or not a measurement
+      ID is configured. There is **NO sitewide `<footer>`**. Verified
+      by an integration test asserting the link is present in both
+      build modes and by a unit test asserting it is rendered in
+      both ContactMenu surfaces.
 
 ## Non-goals
 
@@ -253,14 +265,12 @@ The contract. Each is verifiable by a test or a scripted manual check.
 | `app/composables/useConsent.ts` | **New.** Reads/writes the `localStorage` consent record. Exposes `state: Ref<'unknown'\|'granted'\|'denied'>`, `accept()`, `decline()`, `reset()`, and `respectsGpc: ComputedRef<boolean>`. SSR-safe (returns `state.value = 'unknown'` on server, hydrates in `onMounted`). Reacts to `Sec-GPC`/`DNT` once on mount and short-circuits state to `'denied'` (without writing to localStorage so the visitor can override). |
 | `app/composables/useAnalytics.ts` | **New.** Consumes `useConsent`. When `state === 'granted'` and a measurement ID is configured, lazily imports a tiny loader that injects the `gtag.js` script (`async`, `defer`) and calls `gtag('js', new Date()); gtag('set', { page_location: redactPageLocation(location.href), page_referrer: redactPageLocation(document.referrer) }); gtag('config', id, { anonymize_ip: true, allow_google_signals: false, allow_ad_personalization_signals: false, transport_type: 'beacon', send_page_view: false })` (we set `send_page_view: false` and emit `page_view` ourselves so SPA navigations and the initial view are uniformly handled). Registers a single `router.afterEach` that fires `gtag('event', 'page_view', { page_path, page_location: redactPageLocation(...), page_title })` (AC-22). Exposes `track(eventName: string, params?: Record<string, unknown>): void` which is a no-op until granted. Implements the `IntersectionObserver`-based `observeSection(el, id)` helper used by `app/pages/index.vue`. |
 | `app/utils/redactPageLocation.ts` | **New.** Pure helper: `(url: string) => string` returning a URL with all query params removed except the five `utm_*` marketing params and with the URL fragment removed. Independently unit-tested (AC-21). |
-| `app/components/Ui/ConsentPrompt.vue` | **New.** Renders the non-modal `<aside role="region" aria-labelledby="consent-title">` with copy from `content/legal/consent.md`. Two `<button>`s sharing identical Tailwind classes (`.btn-consent`). Emits `decline` / `accept`; the parent layout wires those to `useConsent`. Includes a `<NuxtLink to="/legal/privacy">` reference. |
-| `app/components/Ui/CookiePreferencesLink.vue` | **New.** Renders a `<button type="button">` (it triggers an in-page UI, not a navigation, so it must not be an anchor). Accessible name "Cookie preferences". Emits an event the layout listens for to re-show `ConsentPrompt`. Hidden via `v-if` when no measurement ID is configured (AC-9). |
-| `app/layouts/default.vue` | Mount `<ClientOnly><ConsentPrompt v-if="showPrompt" /></ClientOnly>` (AC-24 — no SSR flash) and add a footer `<NuxtLink to="/legal/privacy">Privacy</NuxtLink>` (AC-26, always present) plus `<CookiePreferencesLink>` (hidden when no measurement ID, AC-9). Manage the `showPrompt` ref derived from `useConsent().state` and the GPC/DNT short-circuit. |
+| `app/components/Ui/ConsentPrompt.vue` | **New.** Renders the non-modal `<aside role="region" aria-labelledby="consent-title">` with copy from `content/legal/consent.md`. Two `<button>`s sharing identical Tailwind classes (`.btn-consent`). Emits `decline` / `accept`; the parent layout wires those to `useConsent`. Includes a `<NuxtLink to="/legal/privacy">` reference. The frontmatter prompt-body field is named `prompt` (NOT `body`) because @nuxt/content v3 surfaces the parsed markdown AST under the document's `body` property and would shadow it. |
+| `app/components/Ui/CookiePreferencesLink.vue` | **New.** Renders a `<button type="button">` (it triggers an in-page UI, not a navigation, so it must not be an anchor). Accessible name "Cookie preferences". Emits an event the privacy page listens for to call `useConsent().requestReopen()`. Rendered **only** on `/legal/privacy` and only when a measurement ID is configured (AC-9). |
+| `app/layouts/default.vue` | Mount `<ClientOnly><ConsentPrompt v-if="showPrompt" /></ClientOnly>` (AC-24 — no SSR flash). **There is NO `<footer>`.** Watches `useConsent().reopenSignal` so any descendant route (e.g. `/legal/privacy`) can re-open the prompt. Manages `showPrompt` derived from `useConsent().state` and the GPC/DNT short-circuit. |
+| `app/components/Ui/ContactMenu.vue` | Hosts the always-on `<NuxtLink to="/legal/privacy">Privacy</NuxtLink>` link (AC-26) in both the mobile `<details>` dropdown panel and the desktop inline cluster. |
 | `app/pages/index.vue` | Call `useAnalytics().observeSection(el, id)` on each section ref via `onMounted` template refs. No content changes. |
-| `content/legal/consent.md` | **New.** Frontmatter: `title`, `body` (paragraph), `acceptLabel`, `declineLabel`, `privacyHref` (defaults to `/legal/privacy`). |
-| `content/legal/privacy.md` | **New.** Privacy notice page body. |
-| `content.config.ts` | Add a `legal` collection (`type: 'page'`, source `legal/**.md`) with a `consent` schema (title/body/labels) and a generic page schema for `privacy.md`. |
-| `app/pages/legal/privacy.vue` | **New.** Renders `<ContentRenderer>` for `content/legal/privacy.md`. Plain typography; reuses `prose` Tailwind utilities. |
+| `app/pages/legal/privacy.vue` | **New.** Renders `<ContentRenderer>` for `content/legal/privacy.md`. When a measurement ID is configured, renders `<UiCookiePreferencesLink>` near the top and wires its `@open` to `useConsent().requestReopen()`. Plain typography; reuses `prose` Tailwind utilities. |
 | `tailwind.config.js` | Add a single `.btn-consent` component class (or a Tailwind `@apply` block in `app/assets/css/tailwind.css`) to enforce identical sizing for both buttons. |
 | `app/assets/css/tailwind.css` | Add `@layer components { .btn-consent { @apply ... } }`. |
 | `tests/unit/composables/useConsent.spec.ts` | **New.** Mocks `localStorage`, asserts state transitions, GPC/DNT short-circuit, and that `accept()` after a previous `decline()` flips the stored value. |
@@ -326,7 +336,9 @@ interface UseAnalytics {
 // content.config.ts (excerpt)
 const consent = z.object({
   title: z.string().max(60),
-  body: z.string().max(280),
+  // `prompt` not `body` — @nuxt/content v3 reserves the document
+  // `body` property for the parsed-markdown AST.
+  prompt: z.string().max(280),
   acceptLabel: z.string().max(20),
   declineLabel: z.string().max(20),
   privacyHref: z.string().default('/legal/privacy'),
@@ -343,13 +355,19 @@ const consent = z.object({
 
 ```
 app/layouts/default.vue
-├── <header>… (unchanged)
-├── <main>… (unchanged)
-├── <footer>
-│   ├── existing LinkedIn link
-│   └── <CookiePreferencesLink v-if="hasMeasurementId" @open="showPrompt = true" />
-└── <ConsentPrompt v-if="showPrompt" @accept @decline />
+├── <header>…
+│   └── <UiContactMenu>
+│       ├── mobile <details> dropdown: GitHub, Email, LinkedIn, Privacy
+│       └── desktop inline: GitHub, Email, LinkedIn, Privacy (text link)
+├── <main>… (page slot)
+└── <ClientOnly><ConsentPrompt v-if="showPrompt" @accept @decline /></ClientOnly>
+
+app/pages/legal/privacy.vue
+├── <UiCookiePreferencesLink v-if="hasMeasurementId" @open="consent.requestReopen()" />
+└── <ContentRenderer :value="data" />
 ```
+
+(There is **no** sitewide `<footer>`.)
 
 ### State / composables
 
@@ -436,51 +454,53 @@ app/layouts/default.vue
 
 Ordered checklist the implementer ticks as they go.
 
-- [ ] **T1** — Add `runtimeConfig.public.ga.measurementId` to
+- [x] **T1** — Add `runtimeConfig.public.ga.measurementId` to
       `nuxt.config.ts`; document the `NUXT_PUBLIC_GA_MEASUREMENT_ID`
       env var in [README.md](../../README.md).
-- [ ] **T2** — Add `analytics.consentStorageKey` to `app.config.ts`.
-- [ ] **T3** — Create the `legal` content collection in
+- [x] **T2** — Add `analytics.consentStorageKey` to `app.config.ts`.
+- [x] **T3** — Create the `legal` content collection in
       `content.config.ts`, including the `consent` Zod schema.
-- [ ] **T4** — Author `content/legal/consent.md` and
+- [x] **T4** — Author `content/legal/consent.md` and
       `content/legal/privacy.md`.
-- [ ] **T5** — Implement `app/composables/useConsent.ts` (SSR-safe,
+- [x] **T5** — Implement `app/composables/useConsent.ts` (SSR-safe,
       GPC/DNT aware, try/catch around storage). Unit-test alongside.
-- [ ] **T6a** — Implement `app/utils/redactPageLocation.ts` and
+- [x] **T6a** — Implement `app/utils/redactPageLocation.ts` and
       its unit test (AC-21). Pure helper, written first because the
       analytics composable depends on it.
-- [ ] **T6** — Implement `app/composables/useAnalytics.ts`
+- [x] **T6** — Implement `app/composables/useAnalytics.ts`
       (gtag config flags from AC-11, `send_page_view: false`,
       `gtag('set', …)` with redacted location, `router.afterEach`
       `page_view` emitter, lazy script injection, `observeSection`).
       Unit-test alongside.
-- [ ] **T7** — Implement `app/components/Ui/ConsentPrompt.vue` and
+- [x] **T7** — Implement `app/components/Ui/ConsentPrompt.vue` and
       `app/components/Ui/CookiePreferencesLink.vue`. Unit-test
       alongside.
-- [ ] **T8** — Wire mounts in `app/layouts/default.vue`: wrap
-      `<ConsentPrompt>` in `<ClientOnly>` (AC-24); add the always-on
-      footer `<NuxtLink to="/legal/privacy">Privacy</NuxtLink>`
-      (AC-26); add `<CookiePreferencesLink>` next to it (hidden in
-      inert mode, AC-9). Wire section observers in
-      `app/pages/index.vue`.
-- [ ] **T9** — Add the `/legal/privacy` route page. Set
+- [x] **T8** — Wire mounts in `app/layouts/default.vue`: wrap
+      `<ConsentPrompt>` in `<ClientOnly>` (AC-24); watch
+      `useConsent().reopenSignal` so descendant routes can re-open the
+      prompt. **No `<footer>`.** Add the always-on Privacy `NuxtLink`
+      inside `app/components/Ui/ContactMenu.vue` (mobile + desktop,
+      AC-26). Mount `<UiCookiePreferencesLink>` on
+      `app/pages/legal/privacy.vue` when a measurement ID is configured
+      (AC-9). Wire section observers in `app/pages/index.vue`.
+- [x] **T9** — Add the `/legal/privacy` route page. Set
       `useSeoMeta({ robots: 'noindex,follow' })` on it (resolves the
       open question below).
-- [ ] **T10** — Add `.btn-consent` Tailwind component class.
-- [ ] **T11** — Write the integration tests
+- [x] **T10** — Add `.btn-consent` Tailwind component class.
+- [x] **T11** — Write the integration tests
       (`analytics-build.spec.ts`, `legal-schema.spec.ts`, head extend).
-- [ ] **T12** — Write the e2e tests
+- [x] **T12** — Write the e2e tests
       (`ga-consent.spec.ts`, `ga-leak.spec.ts`, `no-js.spec.ts`
       extension, recruiter-scan Lighthouse extension).
-- [ ] **T13** — Update
+- [x] **T13** — Update
       [.github/workflows/deploy-pages.yml](../../.github/workflows/deploy-pages.yml)
       to inject `NUXT_PUBLIC_GA_MEASUREMENT_ID` from a repo secret on
       the `generate` step. **Do not** add it to
       [.github/workflows/ci.yml](../../.github/workflows/ci.yml) — CI
       must exercise the inert path.
-- [ ] **T14** — Run `npm run typecheck && npm run lint && npm test`.
+- [x] **T14** — Run `npm run typecheck && npm run lint && npm test`.
       All green.
-- [ ] **T15** — Append a log under `docs/logs/YYYY-MM-DD-spec-002-*.md`.
+- [x] **T15** — Append a log under `docs/logs/YYYY-MM-DD-spec-002-*.md`.
 
 ## Risks & rollback
 

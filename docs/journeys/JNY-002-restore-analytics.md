@@ -9,6 +9,8 @@ related-specs: [SPEC-002]
 
 # JNY-002 — Restore Google Analytics on the portfolio
 
+> Revised 2026-04-27 — placement moved from footer to header contact menu after minimum-legal review; see SPEC-002 AC-26.
+
 ## Persona
 
 **James, the site owner.** James is the only "user" of this journey: he is
@@ -51,7 +53,8 @@ or trust.
    to understand traffic, with clear "Accept" and "Decline" actions of
    equal visual weight.
 3. The visitor chooses. Their choice is remembered across visits and can
-   be changed later from a persistent footer link ("Cookie preferences").
+   be changed later from a persistent "Privacy" link in the header contact
+   menu, which leads to a page hosting a "Cookie preferences" button.
 4. If they decline (or never choose), no analytics or advertising cookies
    are set and no requests are sent to Google. The page behaves exactly as
    it did in iteration 1.
@@ -82,8 +85,10 @@ or trust.
       size, same prominence, no dark patterns).
 - [ ] Declining or dismissing the prompt persists across reloads and
       across page navigations within the site.
-- [ ] A persistent "Cookie preferences" link in the footer reopens the
-      prompt and lets the visitor change their mind in either direction.
+- [ ] A persistent "Cookie preferences" control on `/legal/privacy`
+      (reachable from the header contact menu via the always-on
+      Privacy link) reopens the prompt and lets the visitor change
+      their mind in either direction.
 - [ ] When the visitor declines, the page passes the same Lighthouse
       performance budget as iteration 1 (TTI < 2 s on simulated 4G).
 - [ ] When the visitor accepts, the analytics script is loaded
@@ -114,9 +119,10 @@ or trust.
   site, polluting James' analytics with their traffic.
 - Analytics events for "section viewed" fire so aggressively (every
   scroll pixel) that they distort the data and inflate Google's quotas.
-- The footer "Cookie preferences" link is missing or broken on the
-  generated static output, so a visitor who declined cannot opt back in
-  — a regulatory issue and a usability one.
+- The persistent withdrawal path (Privacy link in the header contact
+  menu → Cookie preferences button on `/legal/privacy`) is missing or
+  broken on the generated static output, so a visitor who declined
+  cannot opt back in — a regulatory issue and a usability one.
 - The consent record is stored in a way that resets on every visit
   (e.g. `sessionStorage` instead of `localStorage`), nagging the visitor
   on every return — a known abandonment driver.

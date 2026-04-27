@@ -34,7 +34,7 @@ test.describe('home page — JavaScript disabled', () => {
     // And the unavailable-fallback chip text is still visible (since the
     // build seeded the placeholder JSON). Iteration-7 trimmed the visible
     // "GitHub ·" prefix; the GitHub context now lives in aria-label.
-    await expect(chip).toContainText(/recent activity/)
+    await expect(chip).toContainText(/recent activity|last commit/)
     await expect(chip).toHaveAttribute('aria-label', /GitHub/i)
   })
 
@@ -44,5 +44,22 @@ test.describe('home page — JavaScript disabled', () => {
     // Iteration-7: LinkedIn moved out of the contact section into the
     // header ContactMenu. It must NOT live inside #contact anymore.
     await expect(contact.locator('a[href*="linkedin.com"]')).toHaveCount(0)
+  })
+
+  // SPEC-002 AC-15 — JS-disabled output must not include the consent
+  // prompt or the GA tag. The Cookie preferences trigger no longer
+  // lives in the layout (it's on /legal/privacy under JS-gated render),
+  // so the home route must not contain it at all. There is also no
+  // sitewide <footer> in the minimum-legal placement (AC-26 revised).
+  test('AC-15: no consent prompt, no GA tag, no Cookie preferences trigger, no <footer>', async ({ page }) => {
+    const html = await page.content()
+    expect(html).not.toMatch(/<script[^>]+gtag\/js/)
+    expect(html).not.toMatch(/googletagmanager\.com\/gtag/)
+    expect(html).not.toContain('id="consent-title"')
+    expect(html).not.toContain('data-testid="consent-prompt"')
+    // The Cookie preferences trigger lives only on /legal/privacy now.
+    expect(html).not.toContain('data-testid="cookie-preferences-link"')
+    // No sitewide footer.
+    expect(html).not.toMatch(/<footer\b/)
   })
 })

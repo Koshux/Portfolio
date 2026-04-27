@@ -29,8 +29,20 @@ test.describe('home page — smoke', () => {
     await expect(mailto).toBeVisible()
   })
 
-  test('no sitewide <footer> renders (iteration-7 removed it)', async ({ page }) => {
+  test('header contact menu exposes the always-on Privacy link (SPEC-002 AC-26 revised)', async ({ page }) => {
     await page.goto('/')
+    // No sitewide footer in the minimum-legal placement.
     await expect(page.locator('footer')).toHaveCount(0)
+    // The layout always renders the Privacy link in BOTH the mobile
+    // <details> dropdown and the desktop inline cluster — Tailwind
+    // hides whichever doesn't match the viewport. Assert presence in
+    // both surfaces; visibility is project (mobile/desktop) dependent
+    // and covered by the visit-and-click flow in the ga-consent spec.
+    const dropdownLink = page.locator('header details a[href="/legal/privacy"]')
+    const inlineLink = page.locator('header div.md\\:flex a[href="/legal/privacy"]')
+    await expect(dropdownLink).toHaveCount(1)
+    await expect(inlineLink).toHaveCount(1)
+    await expect(dropdownLink).toHaveText('Privacy')
+    await expect(inlineLink).toHaveText('Privacy')
   })
 })

@@ -43,4 +43,13 @@ describe('generated /index.html — head', () => {
   it('does not contain the legacy jameslanzon@gmail.com address', () => {
     expect(html).not.toContain('jameslanzon@gmail.com')
   })
+
+  // SPEC-002 AC-15 — when the env var is unset (the default vitest
+  // globalSetup state), the static HTML must not embed the GA tag at
+  // all (script is consent-gated and injected only client-side; in
+  // inert mode it is never even possible to inject).
+  it('contains no GA4 / gtag script tag in the inert build', () => {
+    expect(html).not.toMatch(/<script[^>]+gtag\/js/)
+    expect(html).not.toMatch(/googletagmanager\.com\/gtag/)
+  })
 })

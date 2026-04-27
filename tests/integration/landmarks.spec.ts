@@ -12,12 +12,16 @@ describe('generated /index.html — landmarks & headings', () => {
     expect(firstAnchor![0]).toMatch(/href="#main"/)
   })
 
-  it('renders <header> + <main id="main" tabindex="-1"> landmarks (no sitewide <footer> in iteration-7)', () => {
+  it('renders <header> + <main id="main" tabindex="-1"> and NO sitewide <footer>', () => {
     expect(html).toMatch(/<header\b/)
     expect(html).toMatch(/<main\b[^>]*\bid="main"[^>]*\btabindex="-1"/)
-    // Iteration-7: the sitewide footer was removed; copyright now lives
-    // in the contact section aside (see content.spec.ts).
+    // SPEC-002 (revised) — minimum-legal placement removed the
+    // sitewide footer; the Privacy link now lives in the header
+    // contact menu (AC-26).
     expect(html).not.toMatch(/<footer\b/)
+    // Exactly one <header> and exactly one <main>.
+    expect((html.match(/<header\b/g) ?? []).length).toBe(1)
+    expect((html.match(/<main\b/g) ?? []).length).toBe(1)
   })
 
   it('renders the sticky header (Tailwind sticky top-0)', () => {
@@ -34,7 +38,7 @@ describe('generated /index.html — landmarks & headings', () => {
     // ContactMenu uses https://github.com/koshux for the GitHub link.
     const githubIdx = header.search(/href="https:\/\/github\.com\/koshux"/)
     const emailIdx = header.search(/href="mailto:lanzonprojects@gmail\.com"/)
-    const linkedinIdx = header.search(/href="https:\/\/www\.linkedin\.com\/in\/jameslanzon"/)
+    const linkedinIdx = header.search(/href="https:\/\/www\.linkedin\.com\/in\/james-lanzon/)
     expect(liveSignalIdx).toBeGreaterThan(-1)
     expect(githubIdx).toBeGreaterThan(liveSignalIdx)
     expect(emailIdx).toBeGreaterThan(githubIdx)
