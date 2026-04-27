@@ -46,9 +46,14 @@ export default defineConfig({
     // the active-path tests (consent banner, GA tag injection on
     // accept) have something to inject. The integration suite covers
     // the inert build (env var unset).
+    //
+    // We FORCE the fixture ID — never inherit from the developer's
+    // shell or `.env`. Inheriting would leak the real GA4 ID into
+    // screenshots, traces, and the leak-guard test, and would also
+    // pollute analytics with synthetic e2e traffic.
     command: 'npm run generate && npm run preview',
     env: {
-      NUXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID ?? 'G-TEST00000',
+      NUXT_PUBLIC_GA_MEASUREMENT_ID: 'G-TEST00000',
     },
     url: baseURL,
     reuseExistingServer: !process.env.CI,
