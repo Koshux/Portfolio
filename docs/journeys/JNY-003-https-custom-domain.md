@@ -1,7 +1,7 @@
 ---
 id: JNY-003
 title: "HTTPS at https://jameslanzon.com via GitHub Pages + Let's Encrypt"
-status: approved
+status: implemented
 created: 2026-04-27
 owner: "James Lanzon"
 related-specs: [SPEC-003]
