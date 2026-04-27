@@ -1,0 +1,44 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Logs (runtime only — SDLC docs/logs/ is the agent audit trail and is tracked)
+/logs
+*.log
+!docs/logs/
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Test artifacts
+coverage
+playwright-report
+test-results
+
+# Local Claude Code overrides
+.claude/settings.local.json
+
+# SPEC-003 — defence-in-depth: never commit TLS key material. The
+# repository never needs any of these (GitHub Pages + Let's Encrypt
+# handles certificates out-of-band). The integration test
+# `tests/integration/no-cert-files.spec.ts` is the primary guard;
+# this entry is the belt-and-braces.
+*.pem
+*.key
+*.crt
+*.csr
+*.p12

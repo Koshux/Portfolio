@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Sticky header is ~57px tall; offset anchor jumps and sequential
+       (Tab) focus scrolling so focused elements aren't hidden under it. */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply font-sans text-ink-black bg-paper-white antialiased;
+    line-height: 1.6;
+  }
+
+  /* prose-friendly defaults for the experience timeline / overview */
+  .prose,
+  .prose-portfolio {
+    max-width: 70ch;
+    line-height: 1.65;
+  }
+
+  .prose-portfolio :where(h2) {
+    @apply mt-12 mb-4 text-2xl font-semibold tracking-tight;
+  }
+
+  .prose-portfolio :where(h3) {
+    @apply mt-6 mb-2 text-lg font-semibold;
+  }
+
+  .prose-portfolio :where(p) {
+    @apply my-3;
+  }
+
+  .prose-portfolio :where(ul) {
+    @apply my-3 pl-5 list-disc;
+  }
+}
+
+@layer components {
+  /*
+   * SPEC-002 AC-4 — equal-weight Accept / Decline buttons for the
+   * consent prompt. Both variants share `.btn-consent` so sizing,
+   * padding, font-weight, and focus ring are identical; the
+   * `--accept` modifier supplies the brand fill. No dark patterns.
+   */
+  .btn-consent {
+    @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-black motion-safe:transition-colors;
+  }
+
+  .btn-consent--decline {
+    @apply border border-paper-white/30 bg-transparent text-paper-white hover:border-paper-white/60 focus-visible:ring-paper-white/60;
+  }
+
+  .btn-consent--accept {
+    @apply border border-nuxt-green bg-nuxt-green text-ink-black hover:bg-nuxt-green/90 focus-visible:ring-nuxt-green;
+  }
+}

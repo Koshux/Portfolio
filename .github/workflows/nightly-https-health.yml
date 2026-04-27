@@ -1,0 +1,74 @@
+name: nightly-https-health
+
+# SPEC-003 AC-13. Runs the production smoke
+# (`tests/e2e/https-health.spec.ts`) against https://jameslanzon.com on
+# a daily schedule and on every push to `main`. Failure opens a single
+# deduplicated GitHub issue labelled `https-health` — one open issue
+# per outage, not one per cron tick. Does NOT block PR merges; the
+# live origin is decoupled from PRs by design.
+
+on:
+  schedule:
+    # 05:30 UTC — well after the typical Let's Encrypt renewal window
+    # so a stuck renewal at ~60 days lights up early.
+    - cron: '30 5 * * *'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: nightly-https-health
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_PROJECT: production-smoke
+      # Used by the issue-dedupe step below.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - id: smoke
+        run: npm run test:e2e:prod
+
+      # On failure: ensure the `https-health` label exists, then either
+      # comment on the existing open issue or create a new one. The
+      # label is created idempotently with `--force`. Dedup is by
+      # label + open state.
+      - name: Open or update HTTPS health issue on failure
+        if: failure() && steps.smoke.conclusion == 'failure'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh label create https-health --color B60205 --description "Production HTTPS health smoke (SPEC-003 AC-13)" --force >/dev/null 2>&1 || true
+          existing="$(gh issue list --label https-health --state open --search 'HTTPS health failure' --json number --jq '.[0].number' || true)"
+          today="$(date -u +%Y-%m-%d)"
+          body="The nightly HTTPS health smoke against https://jameslanzon.com failed.\n\nRun: ${RUN_URL}\nDate (UTC): ${today}\n\nSee \`tests/e2e/https-health.spec.ts\` and the runbook at \`docs/runbooks/https-godaddy-github-pages.md\`."
+          if [ -n "${existing}" ]; then
+            printf '%b' "${body}" | gh issue comment "${existing}" --body-file -
+          else
+            printf '%b' "${body}" | gh issue create \
+              --label https-health \
+              --title "HTTPS health failure (${today})" \
+              --body-file -
+          fi
+
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: playwright-report
+          if-no-files-found: ignore
+          retention-days: 14
