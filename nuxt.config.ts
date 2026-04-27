@@ -31,14 +31,21 @@ export default defineNuxtConfig({
   // module's injection and `npm run dev` errors with
   // `Cannot find module '/css/tailwind.css'`.
 
-  // Public runtime config — values inlined into the static build.
-  // `measurementId` is the GA4 ID; populated from
-  // `NUXT_PUBLIC_GA_MEASUREMENT_ID` at build time. Empty string =
-  // analytics disabled (kill switch). See SPEC-002.
+  // Public runtime config — values inlined into the static build at
+  // `nuxt generate` time. The GA4 measurement ID is read from the
+  // `NUXT_PUBLIC_GA_MEASUREMENT_ID` env var explicitly (rather than
+  // relying solely on Nuxt's auto-override convention) so the binding
+  // is greppable, traceable, and survives any future change to Nuxt's
+  // runtimeConfig resolution rules. Empty string = analytics disabled
+  // (kill switch). See SPEC-002.
+  //
+  // NOTE: because the value is inlined at build time, changing `.env`
+  // requires a fresh `npm run generate` (or a new CI build) — `npm run
+  // preview` alone serves the previously-generated `.output/public`.
   runtimeConfig: {
     public: {
       ga: {
-        measurementId: '',
+        measurementId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID ?? '',
       },
     },
   },

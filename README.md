@@ -190,6 +190,27 @@ deploy workflow injects it on `nuxt generate`. CI deliberately runs
 without the secret so the inert path is exercised on every PR
 ([SPEC-002 §Task breakdown T13](./docs/specs/SPEC-002-restore-analytics.md)).
 
+#### Local testing with a real ID
+
+Because the value is **inlined at build time**, changing `.env` (or
+the env in your shell) only takes effect after a fresh `npm run
+generate`. `npm run preview` alone re-serves the previous
+`.output/public` and ignores any new env value.
+
+```powershell
+# After changing .env or exporting NUXT_PUBLIC_GA_MEASUREMENT_ID
+Remove-Item -Recurse -Force .output -ErrorAction SilentlyContinue
+npm run generate
+npm run preview
+```
+
+To verify the ID was inlined: open DevTools → Network → look for the
+`gtag/js?id=G-…` request after clicking **Accept** on the consent
+prompt. If you see `G-TEST00000`, you are serving a stale
+Playwright-generated build — re-run the steps above.
+
 The Playwright e2e suite uses a fixture ID (`G-TEST00000`) injected by
-[`playwright.config.ts`](./playwright.config.ts) so consent-flow tests
-(banner, accept → page_view) run locally without a real property.
+[`playwright.config.ts`](./playwright.config.ts) — this value is
+**hard-coded** in the config, never inherited from your shell or
+`.env`, so the real ID can never leak into e2e screenshots, traces,
+or the leak-guard test.
