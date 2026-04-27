@@ -25,6 +25,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run generate
+        env:
+          # SPEC-002 — the GA4 measurement ID is inlined into the
+          # static build so the consent-gated tag injection has
+          # something to load. Set the repo secret
+          # `NUXT_PUBLIC_GA_MEASUREMENT_ID` (e.g. `G-XXXXXXXXXX`) under
+          # Settings → Secrets and variables → Actions. When unset the
+          # build is fully inert (no consent prompt, no GA tag, no
+          # cookie-preferences trigger) — see SPEC-002 AC-9.
+          NUXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.NUXT_PUBLIC_GA_MEASUREMENT_ID }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

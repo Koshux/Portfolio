@@ -9,13 +9,13 @@ defineProps<Props>()
 </script>
 
 <template>
-  <section class="px-6 py-16 sm:py-20">
+  <section id="hero" class="px-6 py-16 sm:py-20">
     <div class="mx-auto max-w-3xl">
       <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">
         {{ hero.name }}
       </h1>
       <p class="mt-3 text-lg text-paper-white/80 sm:text-xl">
-        {{ hero.title }} — {{ hero.employer }}
+        {{ hero.title }}<span aria-hidden="true" class="mx-2 text-nuxt-green">—</span>{{ hero.employer }}
       </p>
       <!-- Tagline intentionally hidden in iteration 1 polish; data retained. -->
       <p class="mt-8">

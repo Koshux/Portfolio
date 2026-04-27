@@ -65,14 +65,16 @@ describe('ContactMenu — mobile <details> dropdown', () => {
     expect(details.open).toBe(false)
   })
 
-  it('renders exactly three links in the dropdown panel: GitHub, Email, LinkedIn', async () => {
+  it('renders four links in the dropdown panel: GitHub, Email, LinkedIn, Privacy', async () => {
     const wrapper = await mountSuspended(ContactMenu, { attachTo: host })
     const panelLinks = wrapper.findAll('details a')
-    expect(panelLinks).toHaveLength(3)
+    expect(panelLinks).toHaveLength(4)
     const hrefs = panelLinks.map(a => a.attributes('href'))
     expect(hrefs.some(h => h?.startsWith('https://github.com/'))).toBe(true)
     expect(hrefs.some(h => h?.startsWith('mailto:lanzonprojects@gmail.com'))).toBe(true)
-    expect(hrefs.some(h => h?.includes('linkedin.com/in/jameslanzon'))).toBe(true)
+    expect(hrefs.some(h => h?.includes('linkedin.com/in/james-lanzon'))).toBe(true)
+    // SPEC-002 AC-26 — always-on Privacy link inside the mobile dropdown.
+    expect(hrefs.some(h => h === '/legal/privacy')).toBe(true)
   })
 
   it('opens the LinkedIn link in a new tab with rel="noopener noreferrer"', async () => {
@@ -89,7 +91,7 @@ describe('ContactMenu — mobile <details> dropdown', () => {
 })
 
 describe('ContactMenu — desktop inline cluster', () => {
-  it('renders the inline desktop cluster gated to md:flex with all three IconLinks', async () => {
+  it('renders the inline desktop cluster gated to md:flex with all three IconLinks plus a Privacy text link', async () => {
     const wrapper = await mountSuspended(ContactMenu, { attachTo: host })
     // The inline cluster lives in a sibling <div> with `md:flex` so it is
     // hidden below the breakpoint and visible from md upwards.
@@ -100,7 +102,11 @@ describe('ContactMenu — desktop inline cluster', () => {
     const hrefs = links.map(a => a.attributes('href'))
     expect(hrefs.some(h => h?.startsWith('https://github.com/'))).toBe(true)
     expect(hrefs.some(h => h?.startsWith('mailto:lanzonprojects@gmail.com'))).toBe(true)
-    expect(hrefs.some(h => h?.includes('linkedin.com/in/jameslanzon'))).toBe(true)
+    expect(hrefs.some(h => h?.includes('linkedin.com/in/james-lanzon'))).toBe(true)
+    // SPEC-002 AC-26 — inline Privacy text link (NOT an icon).
+    const privacy = links.find(a => a.attributes('href') === '/legal/privacy')
+    expect(privacy).toBeDefined()
+    expect(privacy!.text()).toBe('Privacy')
   })
 
   it('marks the inline LinkedIn IconLink as external (target=_blank + rel)', async () => {
@@ -116,3 +122,4 @@ describe('ContactMenu — desktop inline cluster', () => {
     expect(rel).toContain('noreferrer')
   })
 })
+

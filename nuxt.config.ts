@@ -31,6 +31,18 @@ export default defineNuxtConfig({
   // module's injection and `npm run dev` errors with
   // `Cannot find module '/css/tailwind.css'`.
 
+  // Public runtime config — values inlined into the static build.
+  // `measurementId` is the GA4 ID; populated from
+  // `NUXT_PUBLIC_GA_MEASUREMENT_ID` at build time. Empty string =
+  // analytics disabled (kill switch). See SPEC-002.
+  runtimeConfig: {
+    public: {
+      ga: {
+        measurementId: '',
+      },
+    },
+  },
+
   // Essential for GH Pages: ensure assets don't start with underscores
   app: {
     baseURL: '/',

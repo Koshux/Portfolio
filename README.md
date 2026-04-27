@@ -174,3 +174,22 @@ Pushes to `main` trigger [`.github/workflows/deploy-pages.yml`](./.github/workfl
 which generates the static site and publishes it to GitHub Pages. CI
 quality gates (typecheck, unit, integration, e2e) run via
 [`.github/workflows/ci.yml`](./.github/workflows/ci.yml).
+
+### Analytics — GA4 (SPEC-002)
+
+GA4 is consent-gated. The measurement ID is inlined into the static
+build via the `NUXT_PUBLIC_GA_MEASUREMENT_ID` env var.
+
+| Env var | Effect |
+|---|---|
+| `NUXT_PUBLIC_GA_MEASUREMENT_ID` | GA4 measurement ID, e.g. `G-XXXXXXXXXX`. **Empty / unset = inert build** (no consent prompt, no GA tag, no Cookie preferences trigger on `/legal/privacy`). The Privacy link in the header contact menu is always rendered regardless. |
+
+Set it as a **GitHub Actions repo secret** under
+**Settings → Secrets and variables → Actions** (same name) so the
+deploy workflow injects it on `nuxt generate`. CI deliberately runs
+without the secret so the inert path is exercised on every PR
+([SPEC-002 §Task breakdown T13](./docs/specs/SPEC-002-restore-analytics.md)).
+
+The Playwright e2e suite uses a fixture ID (`G-TEST00000`) injected by
+[`playwright.config.ts`](./playwright.config.ts) so consent-flow tests
+(banner, accept → page_view) run locally without a real property.

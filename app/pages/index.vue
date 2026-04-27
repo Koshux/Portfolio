@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+
 const cv = await useCvContent()
+const analytics = useAnalytics()
 
 useSeoMeta({
   title: () => cv.hero.value.name
@@ -13,6 +16,16 @@ useSeoMeta({
   ogType: 'website',
   twitterCard: 'summary_large_image',
   twitterImage: () => cv.og.value.image || 'https://jameslanzon.com/og/og-image.png',
+})
+
+// SPEC-002 AC-14 — observe each rendered section once per session.
+// Sections render with stable ids; we look them up after mount rather
+// than threading template refs through every Section component.
+onMounted(() => {
+  for (const id of ['hero', 'projects', 'experience', 'skills', 'contact']) {
+    const el = document.getElementById(id)
+    if (el) analytics.observeSection(el, id)
+  }
 })
 </script>
 
