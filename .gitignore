@@ -31,3 +31,14 @@ test-results
 
 # Local Claude Code overrides
 .claude/settings.local.json
+
+# SPEC-003 — defence-in-depth: never commit TLS key material. The
+# repository never needs any of these (GitHub Pages + Let's Encrypt
+# handles certificates out-of-band). The integration test
+# `tests/integration/no-cert-files.spec.ts` is the primary guard;
+# this entry is the belt-and-braces.
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
