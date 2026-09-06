@@ -18,7 +18,7 @@ overview: |
   thrives on solving complex problems efficiently.
 projects:
   - title: "Above Bored — Seed to Sale ERP"
-    href: "https://app.abovebored.mt"
+    href: "https://abovebored.mt"
     summary: "Co-founded non-profit Cannabis Harm Reduction Association (CHRA-0014) operating under Malta's ARUC framework. Building the seed-to-sale ERP — closed-loop member registry, distribution logging, and compliance reporting for a member-only association (no public substance promotion)."
     role: "President & Head of Distribution"
     repo: "https://github.com/aboveboard-mt/dam-jam"
